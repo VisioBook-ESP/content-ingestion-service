@@ -1,26 +1,50 @@
-# Core dependencies
-fastapi==0.115.5
-uvicorn[standard]==0.32.1
-pydantic==2.10.3
-pydantic-settings==2.6.1
+# Core web framework
+fastapi==0.115.*
 
-# Database
-sqlalchemy==2.0.36
-alembic==1.14.0
-psycopg2-binary==2.9.10
+# ASGI server
+uvicorn[standard]==0.30.*
 
-# HTTP Client
-httpx==0.28.1
-aiohttp==3.11.10
+# Validation & settings
+pydantic==2.*
+pydantic-settings==2.*
+email-validator==2.*
 
-# Data validation and processing
-python-multipart==0.0.20
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
+# Logging
+python-json-logger==2.*
+PyJWT==2.*
+passlib[bcrypt]==1.*
 
-# Logging and monitoring
-structlog==24.4.0
-python-json-logger==3.2.1
+# Database & Cache
+asyncpg==0.29.*
+redis==5.0.*
 
-# Utilities
-python-dotenv==1.0.1
+
+# Monitoring / metrics
+prometheus-client==0.*
+
+# Testing
+pytest
+pytest-cov
+pytest-asyncio
+httpx   # pour tester ton API FastAPI/Starlette
+
+# Linting / formatting / type checking
+black==24.1.1
+ruff==0.13.1
+mypy==1.5.1
+pylint==3.3.8
+astroid==3.3.11
+
+
+
+# Security checks
+bandit
+safety
+pip-audit   # complément moderne à safety
+
+
+# Dev DX
+watchfiles  # hot-reload uvicorn
+ipython
+
+python-multipart
