@@ -1,7 +1,6 @@
 """SQLAlchemy database models."""
 
 from datetime import datetime
-from typing import Optional
 
 from sqlalchemy import JSON, Column, DateTime, Enum, String, Text
 from sqlalchemy.orm import DeclarativeBase
