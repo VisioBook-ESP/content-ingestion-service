@@ -50,13 +50,13 @@ class ContentResponse(BaseModel):
 
     id: str = Field(..., description="Unique content identifier")
     status: IngestionStatus = Field(..., description="Current processing status")
-    message: Optional[str] = Field(None, description="Status message")
-    content_type: Optional[ContentType] = None
-    source: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
-    error: Optional[str] = Field(None, description="Error message if status is failed")
+    message: Optional[str] = Field(default=None, description="Status message")
+    content_type: Optional[ContentType] = Field(default=None)
+    source: Optional[str] = Field(default=None)
+    metadata: Optional[Dict[str, Any]] = Field(default=None)
+    created_at: Optional[datetime] = Field(default=None)
+    updated_at: Optional[datetime] = Field(default=None)
+    error: Optional[str] = Field(default=None, description="Error message if status is failed")
 
     class Config:
         json_schema_extra = {
