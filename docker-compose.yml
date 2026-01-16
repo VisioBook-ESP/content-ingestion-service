@@ -14,7 +14,6 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/appdb
     depends_on:
       - db
-      - redis
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
       interval: 30s
