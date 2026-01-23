@@ -1,6 +1,6 @@
 
 services:
-  user-service:
+  content-ingestion-service:
     build:
       context: .
       dockerfile: docker/Dockerfile.prod
@@ -15,8 +15,11 @@ services:
       - "8080:8080"
     volumes:
       - ./:/app
-    command: uvicorn src.app:app --host 0.0.0.0 --port 8080 --reload
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8080 --reload
     restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
       interval: 30s

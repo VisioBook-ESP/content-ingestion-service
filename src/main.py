@@ -24,9 +24,9 @@ app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description="Content ingestion service for processing and storing content",
-    docs_url=f"{settings.API_PREFIX}/docs",
-    redoc_url=f"{settings.API_PREFIX}/redoc",
-    openapi_url=f"{settings.API_PREFIX}/openapi.json",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
     lifespan=lifespan,
 )
 
@@ -39,9 +39,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(health.router, prefix=settings.API_PREFIX, tags=["health"])
-app.include_router(ingestion.router, prefix=settings.API_PREFIX, tags=["ingestion"])
+# Include routers (no prefix, simpler URLs)
+app.include_router(health.router, tags=["health"])
+app.include_router(ingestion.router, tags=["ingestion"])
 
 
 @app.get("/")

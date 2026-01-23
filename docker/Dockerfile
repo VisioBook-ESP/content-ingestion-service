@@ -14,10 +14,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN apt-get update && apt-get install -y iputils-ping curl && rm -rf /var/lib/apt/lists/*
 
 # copier le reste du code
-COPY ./src .
+COPY ./src ./src
+
+ENV PYTHONPATH=/app
 
 # port
 EXPOSE 8080
 
 # lancer le serveur FastAPI avec Uvicorn
-CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
