@@ -12,7 +12,7 @@ permissions:
   packages: write
 
 env:
-  PYTHON_VERSION: "3.12"
+  PYTHON_VERSION: "3.11"
   IMAGE_REGISTRY: ghcr.io
   IMAGE_NAME: ghcr.io/visiobook-esp/content-ingestion-service-dev
   DOCKERFILE_PROD: docker/Dockerfile.prod
@@ -107,10 +107,8 @@ jobs:
 
       - name: Wait for services to be ready
         run: |
-          echo "Waiting for postgres..."
-          timeout 60 bash -c 'until docker compose -f docker-compose-prod.yml exec -T postgres pg_isready -U test_user -d test_db; do sleep 2; done'
-          echo "Waiting for app..."
-          timeout 120 bash -c 'until curl -sf http://localhost:8080/health; do sleep 3; done'
+          echo "Waiting for services to be healthy..."
+          timeout 180 bash -c 'until [ "$(docker inspect --format="{{.State.Health.Status}}" content-ingestion-service 2>/dev/null)" == "healthy" ]; do sleep 5; done'
           echo "Services ready!"
 
       - name: Run unit tests
