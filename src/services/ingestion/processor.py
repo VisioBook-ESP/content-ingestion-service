@@ -31,7 +31,7 @@ class ContentProcessor:
                 content_type=request.content_type,
                 source=request.source,
                 status=IngestionStatus.PENDING,
-                metadata=request.metadata,
+                content_metadata=request.metadata,
             )
             session.add(content)
             await session.commit()
@@ -125,7 +125,7 @@ class ContentProcessor:
                 status=content.status,
                 content_type=content.content_type,
                 source=content.source,
-                metadata=content.metadata,
+                metadata=content.content_metadata,
                 created_at=content.created_at,
                 updated_at=content.updated_at,
                 error=content.error_message,
@@ -143,7 +143,7 @@ class ContentProcessor:
                     status=content.status,
                     content_type=content.content_type,
                     source=content.source,
-                    metadata=content.metadata,
+                    metadata=content.content_metadata,
                     created_at=content.created_at,
                     updated_at=content.updated_at,
                     error=content.error_message,
