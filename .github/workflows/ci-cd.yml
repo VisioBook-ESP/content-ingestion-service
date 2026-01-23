@@ -79,9 +79,8 @@ jobs:
           [[ -n "$DEBUG_FOUND" ]] && echo "$DEBUG_FOUND"
           [[ -n "$PRINT_FOUND" ]] && echo "$PRINT_FOUND"
           exit 1
-        fi
-
-        echo "----- No debug leftovers outside tests/"
+          fi
+          echo "----- No debug leftovers outside tests/"
 
   unit-tests:
     runs-on: ubuntu-latest
