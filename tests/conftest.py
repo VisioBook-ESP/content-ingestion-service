@@ -14,7 +14,6 @@ from src.database.connection import get_session
 from src.main import app
 from src.models.database import Base
 
-
 # Test database URL (in-memory SQLite)
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 

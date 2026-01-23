@@ -43,9 +43,7 @@ class ContentProcessor:
         """Process content based on its type."""
         try:
             async with get_session() as session:
-                result = await session.execute(
-                    select(Content).where(Content.id == content_id)
-                )
+                result = await session.execute(select(Content).where(Content.id == content_id))
                 content = result.scalar_one_or_none()
 
                 if not content:
@@ -55,7 +53,9 @@ class ContentProcessor:
                 content.status = IngestionStatus.PROCESSING
                 await session.commit()
 
-            logger.info("Processing content", content_id=content_id, content_type=content.content_type)
+            logger.info(
+                "Processing content", content_id=content_id, content_type=content.content_type
+            )
 
             # Process based on content type
             if content.content_type == ContentType.URL:
@@ -69,9 +69,7 @@ class ContentProcessor:
 
             # Mark as completed
             async with get_session() as session:
-                result = await session.execute(
-                    select(Content).where(Content.id == content_id)
-                )
+                result = await session.execute(select(Content).where(Content.id == content_id))
                 content = result.scalar_one_or_none()
                 if content:
                     content.status = IngestionStatus.COMPLETED
@@ -82,9 +80,7 @@ class ContentProcessor:
         except Exception as e:
             logger.error("Content processing failed", content_id=content_id, error=str(e))
             async with get_session() as session:
-                result = await session.execute(
-                    select(Content).where(Content.id == content_id)
-                )
+                result = await session.execute(select(Content).where(Content.id == content_id))
                 content = result.scalar_one_or_none()
                 if content:
                     content.status = IngestionStatus.FAILED
@@ -118,9 +114,7 @@ class ContentProcessor:
     async def get_content_status(self, content_id: str) -> Optional[ContentResponse]:
         """Get content processing status."""
         async with get_session() as session:
-            result = await session.execute(
-                select(Content).where(Content.id == content_id)
-            )
+            result = await session.execute(select(Content).where(Content.id == content_id))
             content = result.scalar_one_or_none()
 
             if not content:
@@ -140,9 +134,7 @@ class ContentProcessor:
     async def list_contents(self, skip: int = 0, limit: int = 100) -> List[ContentResponse]:
         """List all contents with pagination."""
         async with get_session() as session:
-            result = await session.execute(
-                select(Content).offset(skip).limit(limit)
-            )
+            result = await session.execute(select(Content).offset(skip).limit(limit))
             contents = result.scalars().all()
 
             return [
