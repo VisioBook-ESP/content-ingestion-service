@@ -67,19 +67,29 @@ jobs:
         run: mypy --explicit-package-bases src tests
 
   no-debug-leftovers:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Fail if Python debug statements exist outside tests/
-        shell: bash
-        run: |
-          set -euo pipefail
-          if git grep -nI -E '(pdb\.set_trace\(|(^|[^[:alnum:]_])print\(|breakpoint\()' -- \
-              '*.py' ':(exclude)tests/**'; then
-            echo "::error:: Python debug statements found outside tests/." >&2
-            exit 1
-          fi
-          echo "----- No debug leftovers outside tests/"
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+    - name: Fail if Python debug statements exist outside tests/
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        # Cherche pdb.set_trace() et breakpoint() en dehors des dossiers tests/
+        DEBUG_FOUND=$(git grep -nI -E '(pdb\.set_trace\(|breakpoint\()' -- '*.py' | grep -v '^tests/')
+        
+        # Cherche print() en dehors des dossiers tests/
+        PRINT_FOUND=$(git grep -nI -E '(^|[^[:alnum:]_])print\(' -- '*.py' | grep -v '^tests/')
+
+        if [[ -n "$DEBUG_FOUND" || -n "$PRINT_FOUND" ]]; then
+          echo "::error:: Python debug statements found outside tests/."
+          [[ -n "$DEBUG_FOUND" ]] && echo "$DEBUG_FOUND"
+          [[ -n "$PRINT_FOUND" ]] && echo "$PRINT_FOUND"
+          exit 1
+        fi
+
+        echo "----- No debug leftovers outside tests/"
+
 
   unit-tests:
     runs-on: ubuntu-latest
