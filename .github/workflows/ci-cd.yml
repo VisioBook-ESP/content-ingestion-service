@@ -75,7 +75,7 @@ jobs:
         run: |
           set -euo pipefail
           if git grep -nI -E '(pdb\.set_trace\(|(^|[^[:alnum:]_])print\(|breakpoint\()' -- \
-              '*.py' ':(exclude)tests/**'; then
+              '*.py' ':(exclude)tests/**' ':(exclude).venv/**' ':(exclude)venv/**'; then
             echo "::error:: Python debug statements found outside tests/." >&2
             exit 1
           fi
@@ -104,6 +104,14 @@ jobs:
           sed -i 's/^[[:space:]]*//' .env
       - name: docker compose
         run: docker compose -f docker-compose-prod.yml up --build -d
+
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for postgres..."
+          timeout 60 bash -c 'until docker compose -f docker-compose-prod.yml exec -T postgres pg_isready -U test_user -d test_db; do sleep 2; done'
+          echo "Waiting for app..."
+          timeout 120 bash -c 'until curl -sf http://localhost:8080/health; do sleep 3; done'
+          echo "Services ready!"
 
       - name: Run unit tests
         run: docker exec content-ingestion-service pytest tests/ --cov=src --cov-report=term-missing --cov-fail-under=10
