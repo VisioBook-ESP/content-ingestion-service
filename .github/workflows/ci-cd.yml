@@ -66,7 +66,7 @@ jobs:
       - name: Mypy type check
         run: mypy --explicit-package-bases src tests
 
-  no-debug-leftovers:
+no-debug-leftovers:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -74,11 +74,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [[ -n "$DEBUG_FOUND" || -n "$PRINT_FOUND" ]]; then
-          echo "::error:: Python debug statements found outside tests/."
-          [[ -n "$DEBUG_FOUND" ]] && echo "$DEBUG_FOUND"
-          [[ -n "$PRINT_FOUND" ]] && echo "$PRINT_FOUND"
-          exit 1
+          if git grep -nI -E '(pdb\.set_trace\(|(^|[^[:alnum:]_])print\(|breakpoint\()' -- \
+              '*.py' ':(exclude)tests/**'; then
+            echo "::error:: Python debug statements found outside tests/." >&2
+            exit 1
           fi
           echo "----- No debug leftovers outside tests/"
 
