@@ -16,7 +16,7 @@ RUN python -m venv /venv && /venv/bin/pip install -U pip \
 COPY . .
 
 # -------- Production stage --------
-FROM python:3.12-slim AS production
+FROM python:3.11-slim AS production
 WORKDIR /app
 
 # Ajoute libs runtime si besoin (ex: libpq5, libssl3, etc.)

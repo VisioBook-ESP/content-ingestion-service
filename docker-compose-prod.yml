@@ -6,13 +6,15 @@ services:
       dockerfile: docker/Dockerfile.prod
     image: content-ingestion-service:prod
     container_name: content-ingestion-service
-    env_file: .env # Optionnel - seulement en développement local
+    env_file:
+      - path: .env
+        required: false
     environment:
       - PYTHONPATH=/app
       - PYTHONUNBUFFERED=1
       - DATABASE_URL=postgresql://test_user:test_password@postgres:5432/test_db
     ports:
-      - "8080:8080"
+      - "8082:8080"
     volumes:
       - ./:/app
     command: uvicorn src.main:app --host 0.0.0.0 --port 8080 --reload
@@ -35,7 +37,7 @@ services:
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: test_password
     ports:
-      - "5432:5432"
+      - "5434:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U test_user -d test_db"]
       interval: 10s
