@@ -2,7 +2,7 @@
 fastapi==0.115.*
 
 # ASGI server
-uvicorn[standard]==0.30.*
+uvicorn[standard]
 
 # Validation & settings
 pydantic==2.*
@@ -27,6 +27,8 @@ pytest
 pytest-cov
 pytest-asyncio
 httpx   # pour tester ton API FastAPI/Starlette
+structlog
+
 
 # Linting / formatting / type checking
 black==24.1.1
