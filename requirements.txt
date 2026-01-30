@@ -26,9 +26,9 @@ prometheus-client==0.*
 pytest
 pytest-cov
 pytest-asyncio
-httpx   # pour tester ton API FastAPI/Starlette
+httpx
 structlog
-
+aiosqlite
 
 # Linting / formatting / type checking
 black==24.1.1
