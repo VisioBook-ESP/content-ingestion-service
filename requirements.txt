@@ -15,7 +15,7 @@ PyJWT==2.*
 passlib[bcrypt]==1.*
 
 # Database
-sqlalchemy[asyncio]==2.*
+sqlalchemy
 asyncpg==0.29.*
 
 

@@ -1,39 +1,49 @@
-"""SQLAlchemy database models."""
+# src/models/database.py
 
-from datetime import datetime
-from typing import Any, Optional
+import uuid
+from sqlalchemy import Column, String, JSON
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.types import TypeDecorator
 
-from sqlalchemy import DateTime, Enum, String, Text
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-
-from src.models.schemas import ContentType, IngestionStatus
+Base = declarative_base()
 
 
-class Base(DeclarativeBase):
-    """Base class for all database models."""
+class GUID(TypeDecorator):
+    impl = String
+    cache_ok = True
 
-    pass
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(UUID(as_uuid=True))
+        return dialect.type_descriptor(String(36))
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return value
+        if isinstance(value, uuid.UUID):
+            return str(value)
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return value
+        return uuid.UUID(value)
+
+
+class JSONType(TypeDecorator):
+    impl = JSON
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(JSONB())
+        return dialect.type_descriptor(JSON())
 
 
 class Content(Base):
-    """Content model for storing ingested content."""
+    __tablename__ = "content"
 
-    __tablename__ = "contents"
+    id = Column(GUID(), primary_key=True, default=uuid.uuid4)
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, index=True)
-    content_type: Mapped[ContentType] = mapped_column(Enum(ContentType), nullable=False)
-    source: Mapped[str] = mapped_column(Text, nullable=False)
-    status: Mapped[IngestionStatus] = mapped_column(
-        Enum(IngestionStatus), default=IngestionStatus.PENDING, nullable=False
-    )
-    content_metadata: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
-    processed_data: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
-    error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
-    )
-
-    def __repr__(self) -> str:
-        return f"<Content(id={self.id}, type={self.content_type}, status={self.status})>"
+    content_metadata = Column(JSONType, nullable=True)
