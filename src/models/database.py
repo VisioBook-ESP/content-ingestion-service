@@ -1,12 +1,14 @@
-# src/models/database.py
-
 import uuid
-from sqlalchemy import Column, String, JSON
-from sqlalchemy.ext.declarative import declarative_base
+from typing import Any
+
+from sqlalchemy import JSON, String
 from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.types import TypeDecorator
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    pass
 
 
 class GUID(TypeDecorator):
@@ -44,6 +46,6 @@ class JSONType(TypeDecorator):
 class Content(Base):
     __tablename__ = "content"
 
-    id = Column(GUID(), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True, default=uuid.uuid4)
 
-    content_metadata = Column(JSONType, nullable=True)
+    content_metadata: Mapped[dict[str, Any] | None] = mapped_column(JSONType, nullable=True)

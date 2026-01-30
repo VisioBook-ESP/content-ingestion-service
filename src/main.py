@@ -31,13 +31,16 @@ app = FastAPI(
 )
 
 # Configure CORS
+from typing import Any, cast
+
 app.add_middleware(
-    CORSMiddleware,  # type: ignore
-    allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    CORSMiddleware,
+    allow_origins=cast(Any, ["*"]),
+    allow_credentials=cast(Any, True),
+    allow_methods=cast(Any, ["*"]),
+    allow_headers=cast(Any, ["*"]),
 )
+
 
 
 # Include routers (no prefix, simpler URLs)

@@ -2,7 +2,11 @@
 
 from contextlib import asynccontextmanager
 
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from src.config import settings
 from src.models.database import Base
@@ -24,14 +28,18 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 
-async def init_db():
+async def init_db() -> None:
     """Initialize database tables."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
 
+from collections.abc import AsyncIterator
+
+
 @asynccontextmanager
-async def get_session():
+async def get_session() -> AsyncIterator[AsyncSession]:
+
     """Get database session."""
     async with AsyncSessionLocal() as session:
         try:
