@@ -1,70 +1,23 @@
-"""Main application entry point."""
-
-from contextlib import asynccontextmanager
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.routes import health, ingestion
-from src.config import settings
-from src.database.connection import engine, init_db
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Handle application startup and shutdown events."""
-    # Startup
-    await init_db()
-    yield
-    # Shutdown
-    await engine.dispose()
+from src.api.v1.api import api_router
+from src.core.config import settings
 
 
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="Content ingestion service for processing and storing content",
     docs_url="/docs",
     redoc_url="/redoc",
-    openapi_url="/openapi.json",
-    lifespan=lifespan,
 )
-
-# Configure CORS
-from typing import Any, cast
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cast(Any, ["*"]),
-    allow_credentials=cast(Any, True),
-    allow_methods=cast(Any, ["*"]),
-    allow_headers=cast(Any, ["*"]),
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-
-
-# Include routers (no prefix, simpler URLs)
-app.include_router(health.router, tags=["health"])
-app.include_router(ingestion.router, tags=["ingestion"])
-
-
-@app.get("/")
-async def root():
-    """Root endpoint."""
-    return {
-        "service": settings.APP_NAME,
-        "version": settings.APP_VERSION,
-        "status": "running",
-    }
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(
-        "src.main:app",
-        host=settings.API_HOST,
-        port=settings.API_PORT,
-        reload=settings.DEBUG,
-        log_level=settings.LOG_LEVEL.lower(),
-    )
+app.include_router(api_router, prefix=settings.API_PREFIX)

@@ -52,5 +52,11 @@ class Settings(BaseSettings):
     AWS_BUCKET_NAME: str = ""
     AWS_REGION: str = ""
 
+    # External Services
+    STORAGE_SERVICE_URL: str = "http://localhost:8084"
+    AI_SERVICE_URL: str = "http://localhost:8083"
+    DATABASE_SERVICE_URL: str = "http://localhost:8081"
+    PROJECT_SERVICE_URL: str = "http://localhost:8080"
+
 
 settings = Settings()
