@@ -1,0 +1,7 @@
+In der heutigen digitalen Welt spielt die strukturierte Verarbeitung von Daten eine immer wichtigere Rolle. Unternehmen sind darauf angewiesen, große Mengen an Informationen effizient zu sammeln, zu bereinigen und weiterzuverarbeiten. Eine gut konzipierte Datenpipeline ermöglicht es, Rohdaten in verwertbare Informationen umzuwandeln und dadurch fundierte Entscheidungen zu treffen.
+
+Ein zentraler Bestandteil dieser Prozesse ist die Dateningestion. Darunter versteht man die automatisierte Aufnahme von Daten aus unterschiedlichen Quellen, wie zum Beispiel Textdateien, Datenbanken oder externen Schnittstellen. Während dieses Schrittes werden nicht nur die Inhalte extrahiert, sondern auch bereinigt, normalisiert und mit Metadaten angereichert, um eine spätere Verarbeitung zu erleichtern.
+
+Nach der Ingestion folgt häufig die Aufteilung der Daten in kleinere Einheiten, sogenannte Chunks. Diese Segmentierung ist besonders wichtig für Anwendungen im Bereich der künstlichen Intelligenz und der Sprachverarbeitung, da viele Modelle nur mit begrenzten Kontextfenstern arbeiten können. Durch das Chunking wird sichergestellt, dass auch große Dokumente effizient analysiert und indexiert werden können.
+
+Abschließend trägt eine saubere Strukturierung und Speicherung der verarbeiteten Daten wesentlich zur Skalierbarkeit und Wartbarkeit des Gesamtsystems bei. Gut dokumentierte und getestete Ingestionsprozesse bilden daher die Grundlage für leistungsfähige Datenplattformen und moderne, KI-gestützte Anwendungen.
