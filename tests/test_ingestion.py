@@ -29,6 +29,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.processors.docx_processor import DocxProcessor  # noqa: E402
 from src.processors.html_processor import HTMLProcessor  # noqa: E402
+from src.processors.ocr_processor import OCRProcessor  # noqa: E402
 from src.processors.pdf_processor import PDFProcessor  # noqa: E402
 from src.processors.processor_factory import ProcessorFactory  # noqa: E402
 from src.processors.txt_processor import TextProcessor  # noqa: E402
@@ -58,6 +59,7 @@ def process_file(
             TextProcessor(),
             DocxProcessor(),
             HTMLProcessor(),
+            OCRProcessor(),
         ]
     )
     text_cleaning_service = TextCleaningService()
