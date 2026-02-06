@@ -18,6 +18,14 @@ passlib[bcrypt]==1.*
 sqlalchemy
 asyncpg==0.29.*
 
+# Document processing
+python-docx           # DOCX extraction
+pymupdf               # PDF extraction (fitz)
+beautifulsoup4        # HTML parsing
+lxml                  # XML/HTML parser
+pytesseract           # OCR extraction
+Pillow                # Image processing for OCR
+
 
 # Monitoring / metrics
 prometheus-client==0.*

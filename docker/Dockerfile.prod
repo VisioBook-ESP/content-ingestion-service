@@ -1,39 +1,50 @@
-
 # -------- Build stage --------
 FROM python:3.11-slim AS builder
+
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-# Cache pip
-RUN --mount=type=cache,target=/root/.cache/pip true
-
 COPY requirements.txt .
-RUN python -m venv /venv && /venv/bin/pip install -U pip \
+RUN python -m venv /venv \
+    && /venv/bin/pip install -U pip \
     && /venv/bin/pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY ./src ./src
 
 # -------- Production stage --------
 FROM python:3.11-slim AS production
+
 WORKDIR /app
 
-# Ajoute libs runtime si besoin (ex: libpq5, libssl3, etc.)
-# RUN apt-get update && apt-get install -y --no-install-recommends libpq5 && rm -rf /var/lib/apt/lists/*
+# Install runtime dependencies (OCR)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tesseract-ocr \
+    tesseract-ocr-fra \
+    tesseract-ocr-eng \
+    libgl1 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN addgroup --system appgroup && adduser --system --uid 1001 --ingroup appgroup appuser
+# Create non-root user
+RUN addgroup --system appgroup \
+    && adduser --system --uid 1001 --ingroup appgroup appuser
 
+# Copy venv and app from builder
 COPY --from=builder /venv /venv
-COPY --from=builder /app /app
+COPY --from=builder /app/src ./src
 
 ENV PATH=/venv/bin:$PATH \
-    PYTHONPATH=/app
+    PYTHONPATH=/app \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 USER appuser
+
 EXPOSE 8080
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8080/health').getcode()==200 else 1)"
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8080/api/v1/health || exit 1
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "4"]

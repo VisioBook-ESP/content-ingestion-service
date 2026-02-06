@@ -1,25 +1,29 @@
-# image
+# Development Dockerfile
 FROM python:3.11-slim
 
-# répertoire de travail
 WORKDIR /app
 
-# fichiers de dépendances
-COPY requirements.txt .
+# Install system dependencies (OCR + utils)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tesseract-ocr \
+    tesseract-ocr-fra \
+    tesseract-ocr-eng \
+    libgl1 \
+    iputils-ping \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# installer les dépendances
+# Install Python dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# installer ping et curl
-RUN apt-get update && apt-get install -y iputils-ping curl && rm -rf /var/lib/apt/lists/*
-
-# copier le reste du code
+# Copy source code
 COPY ./src ./src
 
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app \
+    PYTHONUNBUFFERED=1
 
-# port
 EXPOSE 8080
 
-# lancer le serveur FastAPI avec Uvicorn
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Development: hot-reload enabled
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
