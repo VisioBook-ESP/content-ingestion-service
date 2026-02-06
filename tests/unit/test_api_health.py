@@ -1,9 +1,10 @@
 """Unit tests for health check endpoints."""
 
+from unittest.mock import AsyncMock, patch
+
 import pytest
-from unittest.mock import patch, AsyncMock
-from fastapi.testclient import TestClient
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 from src.api.v1.routers.health import router as health_router
 

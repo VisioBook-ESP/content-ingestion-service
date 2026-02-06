@@ -12,23 +12,30 @@ Exemples:
 """
 
 import argparse
-import asyncio
 import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+
+def json_serializer(obj):
+    """Convertit les objets non-sérialisables en JSON."""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.processors.processor_factory import ProcessorFactory
-from src.processors.pdf_processor import PDFProcessor
-from src.processors.txt_processor import TextProcessor
-from src.processors.docx_processor import DocxProcessor
-from src.processors.html_processor import HTMLProcessor
-from src.services.text_cleaning_service import TextCleaningService
-from src.services.chunking_service import ChunkingService
-from src.services.metadata_extractor import MetadataExtractor
-from src.schemas.preprocess import CleanOptions
+from src.processors.docx_processor import DocxProcessor  # noqa: E402
+from src.processors.html_processor import HTMLProcessor  # noqa: E402
+from src.processors.pdf_processor import PDFProcessor  # noqa: E402
+from src.processors.processor_factory import ProcessorFactory  # noqa: E402
+from src.processors.txt_processor import TextProcessor  # noqa: E402
+from src.schemas.preprocess import CleanOptions  # noqa: E402
+from src.services.chunking_service import ChunkingService  # noqa: E402
+from src.services.metadata_extractor import MetadataExtractor  # noqa: E402
+from src.services.text_cleaning_service import TextCleaningService  # noqa: E402
 
 
 def process_file(
@@ -45,12 +52,14 @@ def process_file(
         raise FileNotFoundError(f"Fichier non trouvé: {file_path}")
 
     # Initialisation des services
-    processor_factory = ProcessorFactory([
-        PDFProcessor(),
-        TextProcessor(),
-        DocxProcessor(),
-        HTMLProcessor(),
-    ])
+    processor_factory = ProcessorFactory(
+        [
+            PDFProcessor(),
+            TextProcessor(),
+            DocxProcessor(),
+            HTMLProcessor(),
+        ]
+    )
     text_cleaning_service = TextCleaningService()
     chunking_service = ChunkingService()
     metadata_extractor = MetadataExtractor()
@@ -138,14 +147,22 @@ Exemples:
   python scripts/test_ingestion.py rapport.pdf --output rapport.json
   python scripts/test_ingestion.py page.html --chunk-size 50 --overlap 5
   python scripts/test_ingestion.py fichier.docx --no-clean --no-metadata
-        """
+        """,
     )
     parser.add_argument("file", help="Chemin vers le fichier à traiter (txt, pdf, docx, html)")
-    parser.add_argument("-o", "--output", help="Fichier JSON de sortie (défaut: <nom_fichier>_output.json)")
-    parser.add_argument("--chunk-size", type=int, default=100, help="Taille des chunks en mots (défaut: 100)")
-    parser.add_argument("--overlap", type=int, default=10, help="Chevauchement entre chunks en mots (défaut: 10)")
+    parser.add_argument(
+        "-o", "--output", help="Fichier JSON de sortie (défaut: <nom_fichier>_output.json)"
+    )
+    parser.add_argument(
+        "--chunk-size", type=int, default=100, help="Taille des chunks en mots (défaut: 100)"
+    )
+    parser.add_argument(
+        "--overlap", type=int, default=10, help="Chevauchement entre chunks en mots (défaut: 10)"
+    )
     parser.add_argument("--no-clean", action="store_true", help="Désactiver le nettoyage du texte")
-    parser.add_argument("--no-metadata", action="store_true", help="Désactiver l'extraction des métadonnées")
+    parser.add_argument(
+        "--no-metadata", action="store_true", help="Désactiver l'extraction des métadonnées"
+    )
     parser.add_argument("--print", action="store_true", help="Afficher le JSON dans le terminal")
 
     args = parser.parse_args()
@@ -168,14 +185,20 @@ Exemples:
             output_path = Path(args.output)
         else:
             input_path = Path(args.file)
-            output_path = input_path.parent / f"{input_path.stem}_output.json"
+            # Sortie dans tests/outputs/ par défaut
+            outputs_dir = Path(__file__).parent / "outputs"
+            outputs_dir.mkdir(exist_ok=True)
+            output_path = outputs_dir / f"{input_path.stem}_output.json"
+
+        # Créer le dossier parent si nécessaire
+        output_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Écriture du fichier JSON
         with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(result, f, ensure_ascii=False, indent=2)
+            json.dump(result, f, ensure_ascii=False, indent=2, default=json_serializer)
 
         print(f"\n{'='*60}")
-        print(f"RÉSULTAT")
+        print("RÉSULTAT")
         print(f"{'='*60}")
         print(f"✓ Fichier JSON généré: {output_path}")
         print(f"✓ Chunks créés: {result['processing']['totalChunks']}")
@@ -185,7 +208,7 @@ Exemples:
             print(f"\n{'='*60}")
             print("CONTENU JSON:")
             print(f"{'='*60}")
-            print(json.dumps(result, ensure_ascii=False, indent=2))
+            print(json.dumps(result, ensure_ascii=False, indent=2, default=json_serializer))
 
         return 0
 
@@ -195,6 +218,7 @@ Exemples:
     except Exception as e:
         print(f"❌ Erreur lors du traitement: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 

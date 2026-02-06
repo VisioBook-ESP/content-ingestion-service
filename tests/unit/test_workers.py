@@ -1,10 +1,11 @@
 """Unit tests for workers."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from src.workers.job_service import JobService, job_service
+import pytest
+
 from src.schemas.ingest import IngestionOptions
+from src.workers.job_service import JobService
 
 
 class TestJobService:
@@ -84,13 +85,15 @@ class TestIngestionWorker:
     @pytest.fixture
     def mock_services(self):
         """Create mock services for worker."""
-        with patch("src.workers.ingestion_worker.StorageClient") as mock_storage, \
-             patch("src.workers.ingestion_worker.ChunkingService") as mock_chunk, \
-             patch("src.workers.ingestion_worker.MetadataExtractor") as mock_meta, \
-             patch("src.workers.ingestion_worker.DatabaseClient") as mock_db, \
-             patch("src.workers.ingestion_worker.ProcessorFactory") as mock_factory, \
-             patch("src.workers.ingestion_worker.TextCleaningService") as mock_clean, \
-             patch("src.workers.ingestion_worker.job_service") as mock_job:
+        with (
+            patch("src.workers.ingestion_worker.StorageClient") as mock_storage,
+            patch("src.workers.ingestion_worker.ChunkingService") as mock_chunk,
+            patch("src.workers.ingestion_worker.MetadataExtractor") as mock_meta,
+            patch("src.workers.ingestion_worker.DatabaseClient") as mock_db,
+            patch("src.workers.ingestion_worker.ProcessorFactory") as mock_factory,
+            patch("src.workers.ingestion_worker.TextCleaningService") as mock_clean,
+            patch("src.workers.ingestion_worker.job_service") as mock_job,
+        ):
 
             yield {
                 "storage": mock_storage,

@@ -1,19 +1,16 @@
 """Integration tests for the complete ingestion pipeline."""
 
 import pytest
-import tempfile
-import os
-from pathlib import Path
 
-from src.services.ingestion_service import IngestionService
-from src.services.text_cleaning_service import TextCleaningService
-from src.services.chunking_service import ChunkingService
-from src.services.metadata_extractor import MetadataExtractor
+from src.processors.html_processor import HTMLProcessor
 from src.processors.processor_factory import ProcessorFactory
 from src.processors.txt_processor import TextProcessor
-from src.processors.html_processor import HTMLProcessor
 from src.schemas.ingest import IngestionOptions
-from tests.mocks import MockStorageClient, MockDatabaseClient
+from src.services.chunking_service import ChunkingService
+from src.services.ingestion_service import IngestionService
+from src.services.metadata_extractor import MetadataExtractor
+from src.services.text_cleaning_service import TextCleaningService
+from tests.mocks import MockDatabaseClient, MockStorageClient
 
 
 class TestIngestionPipelineIntegration:
@@ -24,16 +21,18 @@ class TestIngestionPipelineIntegration:
         """Create real services (processors, cleaners, etc.) with mocked clients."""
         storage = MockStorageClient(
             content="Ceci est un document de test pour valider le pipeline d'ingestion. "
-                    "Le document contient plusieurs phrases avec du contenu en français. "
-                    "Il permet de tester l'extraction de texte, le nettoyage, "
-                    "la détection de langue et le découpage en chunks."
+            "Le document contient plusieurs phrases avec du contenu en français. "
+            "Il permet de tester l'extraction de texte, le nettoyage, "
+            "la détection de langue et le découpage en chunks."
         )
         db_client = MockDatabaseClient()
 
-        processor_factory = ProcessorFactory([
-            TextProcessor(),
-            HTMLProcessor(),
-        ])
+        processor_factory = ProcessorFactory(
+            [
+                TextProcessor(),
+                HTMLProcessor(),
+            ]
+        )
 
         service = IngestionService(
             storage_client=storage,
@@ -154,7 +153,6 @@ class TestIngestionPipelineIntegration:
     async def test_pipeline_small_chunks(self, real_services):
         """Test pipeline with very small chunk size."""
         service = real_services["service"]
-        db_client = real_services["db_client"]
 
         options = IngestionOptions(
             cleanText=True,
@@ -172,7 +170,6 @@ class TestIngestionPipelineIntegration:
     async def test_pipeline_large_chunks(self, real_services):
         """Test pipeline with chunk size larger than document."""
         service = real_services["service"]
-        db_client = real_services["db_client"]
 
         options = IngestionOptions(
             cleanText=True,

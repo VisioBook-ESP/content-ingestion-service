@@ -1,10 +1,10 @@
 """Unit tests for extract API endpoints."""
 
 import io
+
 import pytest
-from fastapi.testclient import TestClient
 from fastapi import FastAPI
-from unittest.mock import patch, MagicMock
+from fastapi.testclient import TestClient
 
 from src.api.v1.routers.extract import router as extract_router
 
@@ -123,7 +123,15 @@ class TestMetadataExtractionEndpoint:
         assert response.status_code == 200
         data = response.json()
 
-        expected_fields = ["title", "author", "language", "wordCount", "pageCount", "createdAt", "customFields"]
+        expected_fields = [
+            "title",
+            "author",
+            "language",
+            "wordCount",
+            "pageCount",
+            "createdAt",
+            "customFields",
+        ]
         for field in expected_fields:
             assert field in data
 

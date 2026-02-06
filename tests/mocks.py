@@ -3,7 +3,6 @@
 import tempfile
 from pathlib import Path
 from typing import List, Optional
-from unittest.mock import AsyncMock
 
 
 class MockStorageClient:
@@ -50,11 +49,13 @@ class MockDatabaseClient:
     ) -> bool:
         """Save complete JSON document."""
         self.save_called = True
-        self.saved_documents.append({
-            "project_id": project_id,
-            "file_id": file_id,
-            "document": document,
-        })
+        self.saved_documents.append(
+            {
+                "project_id": project_id,
+                "file_id": file_id,
+                "document": document,
+            }
+        )
         return True
 
     async def get_document(self, project_id: str, file_id: str) -> Optional[dict]:
@@ -125,6 +126,7 @@ class MockJobService:
 
     def create_job(self) -> str:
         import uuid
+
         job_id = str(uuid.uuid4())
         self.jobs[job_id] = {"status": "queued", "result": None, "error": None}
         return job_id

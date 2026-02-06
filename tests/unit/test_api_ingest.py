@@ -1,12 +1,12 @@
 """Unit tests for ingestion API endpoints."""
 
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
-from fastapi.testclient import TestClient
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 from src.api.v1.routers.ingest import router as ingest_router
-from src.schemas.ingest import IngestionRequest, IngestionOptions
 
 
 @pytest.fixture
@@ -28,8 +28,10 @@ class TestIngestionEndpoint:
 
     def test_ingest_creates_job(self, client):
         """Test that POST /ingest creates a job and returns job ID."""
-        with patch("src.api.v1.routers.ingest.job_service") as mock_job_service, \
-             patch("src.api.v1.routers.ingest.ingestion_worker") as mock_worker:
+        with (
+            patch("src.api.v1.routers.ingest.job_service") as mock_job_service,
+            patch("src.api.v1.routers.ingest.ingestion_worker"),
+        ):
 
             mock_job_service.create_job.return_value = "test-job-123"
 
@@ -38,7 +40,7 @@ class TestIngestionEndpoint:
                 json={
                     "fileId": "file-abc",
                     "projectId": "project-xyz",
-                }
+                },
             )
 
             assert response.status_code == 200
@@ -48,8 +50,10 @@ class TestIngestionEndpoint:
 
     def test_ingest_with_options(self, client):
         """Test ingestion with custom options."""
-        with patch("src.api.v1.routers.ingest.job_service") as mock_job_service, \
-             patch("src.api.v1.routers.ingest.ingestion_worker") as mock_worker:
+        with (
+            patch("src.api.v1.routers.ingest.job_service") as mock_job_service,
+            patch("src.api.v1.routers.ingest.ingestion_worker"),
+        ):
 
             mock_job_service.create_job.return_value = "test-job-456"
 
@@ -63,8 +67,8 @@ class TestIngestionEndpoint:
                         "extractMetadata": True,
                         "chunkSize": 500,
                         "overlap": 50,
-                    }
-                }
+                    },
+                },
             )
 
             assert response.status_code == 200
@@ -73,10 +77,7 @@ class TestIngestionEndpoint:
 
     def test_ingest_validates_required_fields(self, client):
         """Test that required fields are validated."""
-        response = client.post(
-            "/ingest/",
-            json={}
-        )
+        response = client.post("/ingest/", json={})
 
         assert response.status_code == 422
 

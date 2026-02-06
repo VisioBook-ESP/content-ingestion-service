@@ -4,7 +4,6 @@ import os
 import sys
 import tempfile
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -104,6 +103,7 @@ def clean_options():
 def mock_storage_client():
     """Mock storage client."""
     from tests.mocks import MockStorageClient
+
     return MockStorageClient()
 
 
@@ -111,6 +111,7 @@ def mock_storage_client():
 def mock_db_client():
     """Mock database client."""
     from tests.mocks import MockDatabaseClient
+
     return MockDatabaseClient()
 
 
@@ -118,4 +119,5 @@ def mock_db_client():
 def mock_processor_factory(temp_txt_file):
     """Mock processor factory."""
     from tests.mocks import MockProcessorFactory
+
     return MockProcessorFactory()

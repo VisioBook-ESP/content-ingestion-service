@@ -1,15 +1,13 @@
 """Unit tests for services."""
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
-import os
 
-from src.services.text_cleaning_service import TextCleaningService
-from src.services.chunking_service import ChunkingService
-from src.services.metadata_extractor import MetadataExtractor
-from src.services.ingestion_service import IngestionService
-from src.schemas.preprocess import CleanOptions
 from src.schemas.ingest import IngestionOptions
+from src.schemas.preprocess import CleanOptions
+from src.services.chunking_service import ChunkingService
+from src.services.ingestion_service import IngestionService
+from src.services.metadata_extractor import MetadataExtractor
+from src.services.text_cleaning_service import TextCleaningService
 
 
 class TestTextCleaningService:
@@ -200,9 +198,7 @@ class TestIngestionService:
     """Tests for IngestionService."""
 
     @pytest.fixture
-    def ingestion_service(
-        self, mock_storage_client, mock_db_client, mock_processor_factory
-    ):
+    def ingestion_service(self, mock_storage_client, mock_db_client, mock_processor_factory):
         """Create ingestion service with mocks."""
         return IngestionService(
             storage_client=mock_storage_client,
@@ -245,9 +241,7 @@ class TestIngestionService:
         assert result["totalChunks"] > 0
 
     @pytest.mark.asyncio
-    async def test_ingest_without_clean_text(
-        self, ingestion_service, mock_db_client
-    ):
+    async def test_ingest_without_clean_text(self, ingestion_service, mock_db_client):
         """Test ingestion without text cleaning."""
         options = IngestionOptions(
             cleanText=False,
@@ -261,9 +255,7 @@ class TestIngestionService:
         assert mock_db_client.save_called is True
 
     @pytest.mark.asyncio
-    async def test_ingest_without_metadata(
-        self, ingestion_service, mock_db_client
-    ):
+    async def test_ingest_without_metadata(self, ingestion_service, mock_db_client):
         """Test ingestion without metadata extraction."""
         options = IngestionOptions(
             cleanText=True,

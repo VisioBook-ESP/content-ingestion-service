@@ -1,8 +1,8 @@
 """Unit tests for preprocess API endpoints."""
 
 import pytest
-from fastapi.testclient import TestClient
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 from src.api.v1.routers.preprocess import router as preprocess_router
 
@@ -34,8 +34,8 @@ class TestTextCleanEndpoint:
                     "removeExtraSpaces": True,
                     "normalizeQuotes": False,
                     "fixEncoding": False,
-                }
-            }
+                },
+            },
         )
 
         assert response.status_code == 200
@@ -53,8 +53,8 @@ class TestTextCleanEndpoint:
                     "removeExtraSpaces": False,
                     "normalizeQuotes": True,
                     "fixEncoding": False,
-                }
-            }
+                },
+            },
         )
 
         assert response.status_code == 200
@@ -74,8 +74,8 @@ class TestTextCleanEndpoint:
                     "fixEncoding": True,
                     "removeHeaders": False,
                     "removeFooters": False,
-                }
-            }
+                },
+            },
         )
 
         assert response.status_code == 200
@@ -85,10 +85,7 @@ class TestTextCleanEndpoint:
     def test_clean_requires_text(self, client):
         """Test that text field is required."""
         response = client.post(
-            "/preprocess/text-clean",
-            json={
-                "options": {"removeExtraSpaces": True}
-            }
+            "/preprocess/text-clean", json={"options": {"removeExtraSpaces": True}}
         )
 
         assert response.status_code == 422
@@ -104,7 +101,7 @@ class TestNormalizeEndpoint:
             json={
                 "text": "  Text with whitespace  ",
                 "targetFormat": "plain",
-            }
+            },
         )
 
         assert response.status_code == 200
@@ -118,7 +115,7 @@ class TestNormalizeEndpoint:
             "/preprocess/normalize",
             json={
                 "text": "Some text",
-            }
+            },
         )
 
         assert response.status_code == 200
@@ -139,7 +136,7 @@ class TestChunkEndpoint:
                 "text": text,
                 "chunkSize": 10,
                 "overlap": 2,
-            }
+            },
         )
 
         assert response.status_code == 200
@@ -157,7 +154,7 @@ class TestChunkEndpoint:
             "/preprocess/chunk",
             json={
                 "text": text,
-            }
+            },
         )
 
         assert response.status_code == 200
@@ -173,7 +170,7 @@ class TestChunkEndpoint:
                 "text": "Short text",
                 "chunkSize": 100,
                 "overlap": 10,
-            }
+            },
         )
 
         assert response.status_code == 200
@@ -189,7 +186,7 @@ class TestChunkEndpoint:
                 "text": "",
                 "chunkSize": 10,
                 "overlap": 2,
-            }
+            },
         )
 
         assert response.status_code == 200

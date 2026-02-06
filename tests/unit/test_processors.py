@@ -1,12 +1,11 @@
 """Unit tests for file processors."""
 
 import pytest
-from pathlib import Path
 
-from src.processors.txt_processor import TextProcessor
 from src.processors.html_processor import HTMLProcessor
 from src.processors.pdf_processor import PDFProcessor
 from src.processors.processor_factory import ProcessorFactory
+from src.processors.txt_processor import TextProcessor
 
 
 class TestTextProcessor:
