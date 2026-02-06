@@ -1,5 +1,5 @@
 """Database module."""
 
-from src.database.connection import get_session, engine, AsyncSessionLocal
+from src.database.connection import AsyncSessionLocal, engine, get_session
 
 __all__ = ["get_session", "engine", "AsyncSessionLocal"]

@@ -80,8 +80,7 @@ class TextCleaningService:
         cleaned_lines = []
         for line in lines:
             is_header = any(
-                re.match(pattern, line.strip(), re.IGNORECASE)
-                for pattern in self.HEADER_PATTERNS
+                re.match(pattern, line.strip(), re.IGNORECASE) for pattern in self.HEADER_PATTERNS
             )
             if not is_header:
                 cleaned_lines.append(line)
@@ -92,8 +91,7 @@ class TextCleaningService:
         cleaned_lines = []
         for line in lines:
             is_footer = any(
-                re.match(pattern, line.strip(), re.IGNORECASE)
-                for pattern in self.FOOTER_PATTERNS
+                re.match(pattern, line.strip(), re.IGNORECASE) for pattern in self.FOOTER_PATTERNS
             )
             if not is_footer:
                 cleaned_lines.append(line)

@@ -1,8 +1,10 @@
 import re
+
 from src.processors.base import BaseProcessor
 
 try:
     from bs4 import BeautifulSoup
+
     BS4_AVAILABLE = True
 except ImportError:
     BS4_AVAILABLE = False
@@ -24,7 +26,9 @@ class HTMLProcessor(BaseProcessor):
 
             text = soup.get_text(separator="\n")
         else:
-            text = re.sub(r"<script[^>]*>.*?</script>", "", content, flags=re.DOTALL | re.IGNORECASE)
+            text = re.sub(
+                r"<script[^>]*>.*?</script>", "", content, flags=re.DOTALL | re.IGNORECASE
+            )
             text = re.sub(r"<style[^>]*>.*?</style>", "", text, flags=re.DOTALL | re.IGNORECASE)
             text = re.sub(r"<[^>]+>", " ", text)
             text = re.sub(r"&[a-zA-Z]+;", " ", text)
@@ -36,7 +40,7 @@ class HTMLProcessor(BaseProcessor):
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
 
-        metadata = {"title": None, "author": None, "pages": None}
+        metadata: dict = {"title": None, "author": None, "pages": None}
 
         if BS4_AVAILABLE:
             soup = BeautifulSoup(content, "html.parser")
@@ -53,7 +57,9 @@ class HTMLProcessor(BaseProcessor):
             if description_meta:
                 metadata["description"] = description_meta.get("content")
         else:
-            title_match = re.search(r"<title[^>]*>(.*?)</title>", content, re.IGNORECASE | re.DOTALL)
+            title_match = re.search(
+                r"<title[^>]*>(.*?)</title>", content, re.IGNORECASE | re.DOTALL
+            )
             if title_match:
                 metadata["title"] = title_match.group(1).strip()
 

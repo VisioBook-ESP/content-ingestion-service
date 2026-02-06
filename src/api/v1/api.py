@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from src.api.v1.routers import ingest, preprocess, extract, validate, health
 
+from src.api.v1.routers import extract, health, ingest, preprocess, validate
 
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["health"])

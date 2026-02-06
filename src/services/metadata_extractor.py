@@ -1,11 +1,38 @@
 import re
-from typing import Optional
 
 
 class MetadataExtractor:
     LANGUAGE_INDICATORS = {
-        "fr": ["le", "la", "les", "de", "du", "des", "et", "est", "que", "qui", "dans", "pour", "avec"],
-        "en": ["the", "a", "an", "is", "are", "was", "were", "have", "has", "with", "for", "and", "that"],
+        "fr": [
+            "le",
+            "la",
+            "les",
+            "de",
+            "du",
+            "des",
+            "et",
+            "est",
+            "que",
+            "qui",
+            "dans",
+            "pour",
+            "avec",
+        ],
+        "en": [
+            "the",
+            "a",
+            "an",
+            "is",
+            "are",
+            "was",
+            "were",
+            "have",
+            "has",
+            "with",
+            "for",
+            "and",
+            "that",
+        ],
         "es": ["el", "la", "los", "las", "de", "del", "que", "es", "en", "con", "para", "por"],
         "de": ["der", "die", "das", "und", "ist", "ein", "eine", "mit", "für", "auf", "nicht"],
     }
@@ -47,7 +74,7 @@ class MetadataExtractor:
             scores[lang] = score
 
         if scores:
-            detected = max(scores, key=scores.get)
+            detected = max(scores, key=lambda k: scores[k])
             if scores[detected] >= 3:
                 return detected
 

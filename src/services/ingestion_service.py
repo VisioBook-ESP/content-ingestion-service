@@ -3,10 +3,8 @@
 import logging
 import os
 from datetime import datetime, timezone
-from typing import Optional
 
 from src.schemas.preprocess import CleanOptions
-
 
 logger = logging.getLogger(__name__)
 

@@ -5,7 +5,6 @@ from src.schemas.ingest import IngestionRequest, IngestionResponse
 from src.workers.ingestion_worker import ingestion_worker
 from src.workers.job_service import job_service
 
-
 router = APIRouter()
 
 
