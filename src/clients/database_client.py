@@ -1,18 +1,20 @@
 """Client for core-database-service communication."""
 
-import httpx
-from typing import List, Optional
 import logging
+from typing import Optional
+
+import httpx
 
 from src.core.config import settings
-
 
 logger = logging.getLogger(__name__)
 
 
 class DatabaseClient:
     def __init__(self, base_url: Optional[str] = None):
-        self.base_url = base_url or getattr(settings, "DATABASE_SERVICE_URL", "http://localhost:8081")
+        self.base_url = base_url or getattr(
+            settings, "DATABASE_SERVICE_URL", "http://localhost:8081"
+        )
         self.timeout = httpx.Timeout(60.0)
 
     async def save_document(

@@ -1,18 +1,18 @@
 import logging
 
-from src.services.ingestion_service import IngestionService
-from src.services.storage_client import StorageClient
-from src.services.chunking_service import ChunkingService
-from src.services.metadata_extractor import MetadataExtractor
 from src.clients.database_client import DatabaseClient
-from src.processors.processor_factory import ProcessorFactory
-from src.services.text_cleaning_service import TextCleaningService
-from src.processors.pdf_processor import PDFProcessor
-from src.processors.txt_processor import TextProcessor
 from src.processors.docx_processor import DocxProcessor
 from src.processors.html_processor import HTMLProcessor
+from src.processors.ocr_processor import OCRProcessor
+from src.processors.pdf_processor import PDFProcessor
+from src.processors.processor_factory import ProcessorFactory
+from src.processors.txt_processor import TextProcessor
+from src.services.chunking_service import ChunkingService
+from src.services.ingestion_service import IngestionService
+from src.services.metadata_extractor import MetadataExtractor
+from src.services.storage_client import StorageClient
+from src.services.text_cleaning_service import TextCleaningService
 from src.workers.job_service import job_service
-
 
 logger = logging.getLogger(__name__)
 
@@ -24,12 +24,15 @@ class IngestionWorker:
             chunking_service=ChunkingService(),
             metadata_extractor=MetadataExtractor(),
             db_client=DatabaseClient(),
-            processor_factory=ProcessorFactory([
-                PDFProcessor(),
-                TextProcessor(),
-                DocxProcessor(),
-                HTMLProcessor(),
-            ]),
+            processor_factory=ProcessorFactory(
+                [
+                    PDFProcessor(),
+                    TextProcessor(),
+                    DocxProcessor(),
+                    HTMLProcessor(),
+                    OCRProcessor(),
+                ]
+            ),
             text_cleaning_service=TextCleaningService(),
         )
 

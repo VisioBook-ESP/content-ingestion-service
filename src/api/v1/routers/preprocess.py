@@ -1,11 +1,11 @@
-from fastapi import APIRouter
 from typing import List
+
+from fastapi import APIRouter
 from pydantic import BaseModel
 
 from src.schemas.preprocess import TextCleanRequest, TextCleanResponse
-from src.services.text_cleaning_service import TextCleaningService
 from src.services.chunking_service import ChunkingService
-
+from src.services.text_cleaning_service import TextCleaningService
 
 router = APIRouter()
 cleaner = TextCleaningService()

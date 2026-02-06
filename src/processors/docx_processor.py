@@ -2,6 +2,7 @@ from src.processors.base import BaseProcessor
 
 try:
     from docx import Document
+
     DOCX_AVAILABLE = True
 except ImportError:
     DOCX_AVAILABLE = False

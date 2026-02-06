@@ -1,14 +1,14 @@
 """Client for support-storage-service communication."""
 
-import httpx
-import tempfile
+import logging
 import os
+import tempfile
 from pathlib import Path
 from typing import Optional
-import logging
+
+import httpx
 
 from src.core.config import settings
-
 
 logger = logging.getLogger(__name__)
 

@@ -1,24 +1,26 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
-from pydantic import BaseModel
-import tempfile
 import os
+import tempfile
 
-from src.schemas.extract import MetadataResponse
-from src.processors.processor_factory import ProcessorFactory
-from src.processors.pdf_processor import PDFProcessor
-from src.processors.txt_processor import TextProcessor
+from fastapi import APIRouter, File, HTTPException, UploadFile
+from pydantic import BaseModel
+
 from src.processors.docx_processor import DocxProcessor
 from src.processors.html_processor import HTMLProcessor
+from src.processors.pdf_processor import PDFProcessor
+from src.processors.processor_factory import ProcessorFactory
+from src.processors.txt_processor import TextProcessor
+from src.schemas.extract import MetadataResponse
 from src.services.metadata_extractor import MetadataExtractor
 
-
 router = APIRouter()
-processor_factory = ProcessorFactory([
-    PDFProcessor(),
-    TextProcessor(),
-    DocxProcessor(),
-    HTMLProcessor(),
-])
+processor_factory = ProcessorFactory(
+    [
+        PDFProcessor(),
+        TextProcessor(),
+        DocxProcessor(),
+        HTMLProcessor(),
+    ]
+)
 metadata_extractor = MetadataExtractor()
 
 

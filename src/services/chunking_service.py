@@ -6,7 +6,7 @@ class ChunkingService:
         chunks = []
         i = 0
         while i < len(words):
-            chunk_words = words[i:i+size]
+            chunk_words = words[i : i + size]
             chunks.append(" ".join(chunk_words))
             i += size - overlap
         return chunks
