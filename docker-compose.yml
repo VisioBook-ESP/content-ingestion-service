@@ -60,7 +60,7 @@ services:
     container_name: content-ingestion-db
     restart: unless-stopped
     ports:
-      - "5433:5432"
+      - "5435:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -72,6 +72,17 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - ingestion-network
+
+  adminer:
+    image: adminer
+    container_name: content-ingestion-adminer
+    restart: unless-stopped
+    ports:
+      - "8086:8080"
+    depends_on:
+      - db
     networks:
       - ingestion-network
 

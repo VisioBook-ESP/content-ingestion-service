@@ -1,0 +1,45 @@
+{
+  "fileId": "exemple",
+  "fileName": "exemple.txt",
+  "fileType": ".txt",
+  "fileSize": 639,
+  "processedAt": "2026-02-12T14:34:42.416931+00:00",
+  "status": "completed",
+  "options": {
+    "cleanText": true,
+    "extractMetadata": true,
+    "chunkSize": 100,
+    "overlap": 10
+  },
+  "metadata": {
+    "wordCount": 92,
+    "charCount": 607,
+    "language": "fr",
+    "customFields": {
+      "paragraphCount": 5,
+      "sentenceCount": 5
+    }
+  },
+  "processing": {
+    "cleaningApplied": [
+      "fixEncoding",
+      "normalizeQuotes",
+      "removeExtraSpaces"
+    ],
+    "totalChunks": 2,
+    "totalCharacters": 607,
+    "rawCharacters": 612
+  },
+  "chunks": [
+    {
+      "index": 0,
+      "content": "Ceci est un document de test pour valider le pipeline d'ingestion. Le document contient plusieurs paragraphes avec du contenu en français. Il permet de tester l'extraction de texte, le nettoyage, la détection de langue et le découpage en chunks. Voici un second paragraphe avec des espaces multiples et des \"guillemets\" français qui seront normalisés par le service de nettoyage. Le troisième paragraphe contient des informations techniques: - Point numéro 1 - Point numéro 2 - Point numéro 3 Conclusion: ce document permet de valider que le microservice fonctionne correctement pour les fichiers texte.",
+      "wordCount": 93
+    },
+    {
+      "index": 1,
+      "content": "les fichiers texte.",
+      "wordCount": 3
+    }
+  ]
+}
