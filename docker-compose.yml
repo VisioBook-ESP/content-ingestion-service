@@ -1,0 +1,101 @@
+services:
+  content-ingestion-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: content-ingestion-service
+    ports:
+      - "8090:8080"
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - content-storage:/tmp/content
+    environment:
+      # Application
+      - APP_NAME=content-ingestion-service
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+      # API
+      - API_HOST=0.0.0.0
+      - API_PORT=8080
+      - API_PREFIX=/api/v1
+      # Database
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/content_ingestion
+      - DATABASE_POOL_SIZE=5
+      - DATABASE_MAX_OVERFLOW=10
+      # Redis
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_PASSWORD=
+      # Security
+      - SECRET_KEY=dev-secret-key-change-in-prod
+      - JWT_ALGORITHM=HS256
+      - JWT_EXPIRE_MINUTES=30
+      # Storage
+      - STORAGE_TYPE=local
+      - STORAGE_PATH=/tmp/content
+      # External services
+      - STORAGE_SERVICE_URL=http://storage-service:8080
+      - AI_SERVICE_URL=http://ai-service:8080
+      - DATABASE_SERVICE_URL=http://database-service:8080
+      - PROJECT_SERVICE_URL=http://project-service:8080
+      # CORS
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:8080
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/api/v1/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - ingestion-network
+
+  db:
+    image: postgres:14-alpine
+    container_name: content-ingestion-db
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: content_ingestion
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d content_ingestion"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ingestion-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: content-ingestion-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ingestion-network
+
+volumes:
+  db_data:
+  redis_data:
+  content-storage:
+
+networks:
+  ingestion-network:
+    driver: bridge
