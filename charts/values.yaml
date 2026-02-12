@@ -1,0 +1,95 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/visiobook-esp/content-ingestion-service-dev
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3000
+  targetPort: 8086
+
+nameOverride: ""
+fullnameOverride: "content-ingestion-service"
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 80
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+istio:
+  enabled: true
+  injection: true
+
+  virtualService:
+    enabled: true
+    hosts:
+      - "content-ingestion-service"
+      - "content-ingestion-service.visiobook.dev"
+    gateways:
+      - mesh
+  destinationRule:
+    enabled: true
+    trafficPolicy:
+      connectionPool:
+        tcp:
+          maxConnections: 100
+        http:
+          http1MaxPendingRequests: 100
+          http2MaxRequests: 100
+          maxRequestsPerConnection: 2
+      loadBalancer:
+        simple: ROUND_ROBIN
+      outlierDetection:
+        consecutiveErrors: 5
+        interval: 30s
+        baseEjectionTime: 30s
+
+  mtls:
+    enabled: true
+    mode: ISTIO_MUTUAL
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+podLabels:
+  app: content-ingestion-service
+  version: "latest"
+  app.kubernetes.io/name: content-ingestion-service
+  app.kubernetes.io/version: "latest"
+  app.kubernetes.io/component: backend
+
+resources: {}
+
+env:
+ env:
+  # Application
+  APP_NAME=content-ingestion-service
+  APP_VERSION=0.1.0
+  ENVIRONMENT=production
+  DEBUG=true
+  LOG_LEVEL=INFO
+
+  # API Configuration
+  API_HOST=0.0.0.0
+  API_PORT=8080
+  API_PREFIX=/api/v1
+  
+
+  # Redis (for caching/queuing) 
+  #REDIS_URL=redis://localhost:6379/0
+  #REDIS_PASSWORD=
+
+  # CORS
+  CORS_ORIGINS=["http://localhost:3000", "http://localhost:8000"]
+
+  # Content Storage
+  STORAGE_TYPE=local 

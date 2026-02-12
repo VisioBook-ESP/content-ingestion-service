@@ -1,0 +1,50 @@
+# -------- Build stage --------
+FROM python:3.11-slim AS builder
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+COPY requirements.txt .
+RUN python -m venv /venv \
+    && /venv/bin/pip install -U pip \
+    && /venv/bin/pip install --no-cache-dir -r requirements.txt
+
+COPY ./src ./src
+
+# -------- Production stage --------
+FROM python:3.11-slim AS production
+
+WORKDIR /app
+
+# Install runtime dependencies (OCR)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tesseract-ocr \
+    tesseract-ocr-fra \
+    tesseract-ocr-eng \
+    libgl1 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN addgroup --system appgroup \
+    && adduser --system --uid 1001 --ingroup appgroup appuser
+
+# Copy venv and app from builder
+COPY --from=builder /venv /venv
+COPY --from=builder /app/src ./src
+
+ENV PATH=/venv/bin:$PATH \
+    PYTHONPATH=/app \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+USER appuser
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8080/api/v1/health || exit 1
+
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "4"]

@@ -1,0 +1,60 @@
+# Core web framework
+fastapi==0.115.*
+
+# ASGI server
+uvicorn[standard]
+
+# Validation & settings
+pydantic==2.*
+pydantic-settings==2.*
+email-validator==2.*
+
+# Logging
+python-json-logger==2.*
+PyJWT==2.*
+passlib[bcrypt]==1.*
+
+# Database
+sqlalchemy
+asyncpg==0.29.*
+
+# Document processing
+python-docx           # DOCX extraction
+pymupdf               # PDF extraction (fitz)
+beautifulsoup4        # HTML parsing
+lxml                  # XML/HTML parser
+pytesseract           # OCR extraction
+Pillow                # Image processing for OCR
+
+
+# Monitoring / metrics
+prometheus-client==0.*
+
+# Testing
+pytest
+pytest-cov
+pytest-asyncio
+httpx
+structlog
+aiosqlite
+
+# Linting / formatting / type checking
+black==24.1.1
+ruff==0.13.1
+mypy==1.5.1
+pylint==3.3.8
+astroid==3.3.11
+
+
+
+# Security checks
+bandit
+safety
+pip-audit   # complément moderne à safety
+
+
+# Dev DX
+watchfiles  # hot-reload uvicorn
+ipython
+
+python-multipart

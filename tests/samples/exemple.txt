@@ -1,0 +1,16 @@
+Ceci est un document de test pour valider le pipeline d'ingestion.
+
+Le document contient plusieurs paragraphes avec du contenu en français.
+Il permet de tester l'extraction de texte, le nettoyage, la détection
+de langue et le découpage en chunks.
+
+Voici un second paragraphe avec des   espaces   multiples et des
+«guillemets» français qui seront normalisés par le service de nettoyage.
+
+Le troisième paragraphe contient des informations techniques:
+- Point numéro 1
+- Point numéro 2
+- Point numéro 3
+
+Conclusion: ce document permet de valider que le microservice fonctionne
+correctement pour les fichiers texte.
