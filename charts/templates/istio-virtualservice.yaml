@@ -1,0 +1,20 @@
+{{- if and .Values.istio .Values.istio.enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ include "content-ingestion-service.fullname" . }}
+  labels:
+    {{- include "content-ingestion-service.labels" . | nindent 4 }}
+spec:
+  hosts:
+    - {{ include "content-ingestion-service.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: {{ include "content-ingestion-service.fullname" . }}
+            port:
+              number: {{ .Values.service.port }}
+{{- end }}
