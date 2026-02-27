@@ -15,8 +15,7 @@ class PDFProcessor(BaseProcessor):
     def extract_text(self, file_path: str) -> str:
         if not PYMUPDF_AVAILABLE:
             raise ImportError(
-                "PyMuPDF is required for PDF processing. "
-                "Install it with: pip install pymupdf"
+                "PyMuPDF is required for PDF processing. " "Install it with: pip install pymupdf"
             )
 
         doc = fitz.open(file_path)

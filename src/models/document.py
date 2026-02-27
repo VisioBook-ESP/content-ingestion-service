@@ -68,9 +68,7 @@ class Document(Base):
         server_default=func.now(),
     )
 
-    __table_args__ = (
-        Index("ix_documents_project_status", "project_id", "status"),
-    )
+    __table_args__ = (Index("ix_documents_project_status", "project_id", "status"),)
 
     def __repr__(self) -> str:
         return f"<Document(id={self.id}, file_id={self.file_id}, status={self.status})>"

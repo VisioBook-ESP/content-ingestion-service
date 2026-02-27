@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wsl -e bash -c \"cd ~/ESP/content-ingestion-service && python -m pytest tests/unit/test_processors.py::TestPDFProcessor -v 2>&1\")",
+      "Bash(wsl -e bash -c \"sleep 5 && docker ps --format ''table {{.Names}}\\\\t{{.Status}}'' && docker logs content-ingestion-service --tail 10 2>&1\")"
+    ]
+  }
+}

@@ -14,7 +14,20 @@ from src.processors.txt_processor import TextProcessor
 
 router = APIRouter()
 
-SUPPORTED_EXTENSIONS = {".txt", ".pdf", ".docx", ".html", ".htm", ".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".gif", ".webp"}
+SUPPORTED_EXTENSIONS = {
+    ".txt",
+    ".pdf",
+    ".docx",
+    ".html",
+    ".htm",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".tiff",
+    ".bmp",
+    ".gif",
+    ".webp",
+}
 DEFAULT_MAX_SIZE_MB = 50
 
 processor_factory = ProcessorFactory(
@@ -39,7 +52,9 @@ class ValidationResponse(BaseModel):
 @router.post("/", response_model=ValidationResponse)
 async def validate(
     file: UploadFile = File(...),
-    max_size_mb: Optional[float] = Query(default=DEFAULT_MAX_SIZE_MB, description="Taille max en MB"),
+    max_size_mb: Optional[float] = Query(
+        default=DEFAULT_MAX_SIZE_MB, description="Taille max en MB"
+    ),
 ):
     """Valide un fichier avant ingestion : format, taille, lisibilite."""
     errors = []
@@ -48,17 +63,20 @@ async def validate(
 
     # 1. Format supporte
     if ext not in SUPPORTED_EXTENSIONS:
-        errors.append(f"Format non supporte: '{ext}'. Formats acceptes: {', '.join(sorted(SUPPORTED_EXTENSIONS))}")
+        accepted = ", ".join(sorted(SUPPORTED_EXTENSIONS))
+        errors.append(f"Format non supporte: '{ext}'. Formats acceptes: {accepted}")
 
     # 2. Lire le contenu et verifier la taille
     content = await file.read()
     file_size = len(content)
-    max_bytes = int(max_size_mb * 1024 * 1024)
+    max_bytes = int((max_size_mb or DEFAULT_MAX_SIZE_MB) * 1024 * 1024)
 
     if file_size == 0:
         errors.append("Le fichier est vide")
     elif file_size > max_bytes:
-        errors.append(f"Fichier trop volumineux: {file_size / (1024*1024):.1f} MB (max: {max_size_mb} MB)")
+        errors.append(
+            f"Fichier trop volumineux: {file_size / (1024*1024):.1f} MB (max: {max_size_mb} MB)"
+        )
 
     # 3. Tester la lisibilite (extraction de texte)
     if not errors and ext in SUPPORTED_EXTENSIONS:

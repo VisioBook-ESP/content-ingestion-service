@@ -70,26 +70,26 @@ podLabels:
 resources: {}
 
 env:
- env:
   # Application
-  APP_NAME=content-ingestion-service
-  APP_VERSION=0.1.0
-  ENVIRONMENT=production
-  DEBUG=true
-  LOG_LEVEL=INFO
+  APP_NAME: "content-ingestion-service"
+  APP_VERSION: "0.1.0"
+  ENVIRONMENT: "production"
+  DEBUG: "false"
+  LOG_LEVEL: "INFO"
 
   # API Configuration
-  API_HOST=0.0.0.0
-  API_PORT=8080
-  API_PREFIX=/api/v1
-  
-
-  # Redis (for caching/queuing) 
-  #REDIS_URL=redis://localhost:6379/0
-  #REDIS_PASSWORD=
+  API_HOST: "0.0.0.0"
+  API_PORT: "8080"
+  API_PREFIX: "/api/v1"
 
   # CORS
-  CORS_ORIGINS=["http://localhost:3000", "http://localhost:8000"]
+  CORS_ORIGINS: '["https://visiobook.cloud"]'
 
-  # Content Storage
-  STORAGE_TYPE=local 
+  # MinIO
+  MINIO_ENDPOINT: "minio:9000"
+  MINIO_BUCKET_NAME: "content-ingestion"
+  MINIO_SECURE: "false"
+
+secrets:
+  MINIO_ACCESS_KEY: "minioadmin"
+  MINIO_SECRET_KEY: "minioadmin"

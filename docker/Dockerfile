@@ -19,6 +19,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy source code
 COPY ./src ./src
+COPY ./alembic ./alembic
+COPY ./alembic.ini ./alembic.ini
 
 ENV PYTHONPATH=/app \
     PYTHONUNBUFFERED=1
