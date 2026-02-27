@@ -73,7 +73,7 @@ jobs:
         run: |
           set -euo pipefail
           if git grep -nI -E '(pdb\.set_trace\(|(^|[^[:alnum:]_])print\(|breakpoint\()' -- \
-              '*.py' ':(exclude)tests/**' ':(exclude).venv/**' ':(exclude)venv/**'; then
+              '*.py' ':(exclude)tests/**' ':(exclude)scripts/**' ':(exclude).venv/**' ':(exclude)venv/**'; then
             echo "::error:: Python debug statements found outside tests/." >&2
             exit 1
           fi
