@@ -79,6 +79,11 @@ progressDeadlineSeconds: 60 # temps max pour que le pod soit opérationnel avant
 minReadySeconds: 10 # le pod doit être stable 10s avant d'être considéré Available (évite les faux positifs)
 terminationGracePeriodSeconds: 10 # délai avant SIGKILL (30s par défaut, réduit pour les tests)
 
+existingSecret: ""
+existingMinioSecret: ""
+
+
+
 env:
   # Application
   APP_NAME: content-ingestion-service
