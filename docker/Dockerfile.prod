@@ -12,6 +12,7 @@ RUN python -m venv /venv \
     && /venv/bin/pip install --no-cache-dir -r requirements.txt
 
 COPY ./src ./src
+COPY ./tests ./tests
 COPY ./alembic ./alembic
 COPY ./alembic.ini ./alembic.ini
 COPY ./docker/entrypoint.sh ./entrypoint.sh
@@ -37,6 +38,7 @@ RUN addgroup --system appgroup \
 # Copy venv, app, alembic and entrypoint from builder
 COPY --from=builder /venv /venv
 COPY --from=builder /app/src ./src
+COPY --from=builder /app/tests ./tests
 COPY --from=builder /app/alembic ./alembic
 COPY --from=builder /app/alembic.ini ./alembic.ini
 COPY --from=builder /app/entrypoint.sh ./entrypoint.sh
