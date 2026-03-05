@@ -1,4 +1,5 @@
 import logging
+from functools import lru_cache
 
 from src.clients.database_client import DatabaseClient
 from src.processors.docx_processor import DocxProcessor
@@ -49,4 +50,6 @@ class IngestionWorker:
             logger.error(f"Job {job_id} failed: {e}")
 
 
-ingestion_worker = IngestionWorker()
+@lru_cache(maxsize=1)
+def get_ingestion_worker() -> IngestionWorker:
+    return IngestionWorker()

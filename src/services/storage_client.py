@@ -23,14 +23,18 @@ class StorageClient:
             secure=settings.MINIO_SECURE,
         )
         self.bucket = settings.MINIO_BUCKET_NAME
-        self._ensure_bucket()
+        self._bucket_ensured = False
 
     def _ensure_bucket(self) -> None:
+        if self._bucket_ensured:
+            return
         if not self.client.bucket_exists(self.bucket):
             self.client.make_bucket(self.bucket)
             logger.info(f"Created MinIO bucket: {self.bucket}")
+        self._bucket_ensured = True
 
     async def upload(self, file_data: bytes, file_name: str, content_type: str) -> str:
+        self._ensure_bucket()
         file_id = str(uuid.uuid4())
         object_name = f"{file_id}/{file_name}"
 
@@ -48,6 +52,8 @@ class StorageClient:
         return file_id
 
     async def download(self, file_id: str) -> Path:
+        self._ensure_bucket()
+
         def _list():
             return list(self.client.list_objects(self.bucket, prefix=f"{file_id}/"))
 
