@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api/v1"
 
     # Database
-    DATABASE_URL: str = "postgresql://user:password@localhost:5432/content_ingestion"
+    DATABASE_URL: str = "postgresql+asyncpg://user:password@localhost:5432/content_ingestion"
     DATABASE_POOL_SIZE: int = 5
     DATABASE_MAX_OVERFLOW: int = 10
 
