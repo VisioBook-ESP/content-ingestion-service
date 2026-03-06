@@ -30,7 +30,7 @@ class TestIngestionEndpoint:
         """Test that POST /ingest creates a job and returns job ID."""
         with (
             patch("src.api.v1.routers.ingest.job_service") as mock_job_service,
-            patch("src.api.v1.routers.ingest.ingestion_worker"),
+            patch("src.api.v1.routers.ingest.get_ingestion_worker"),
         ):
 
             mock_job_service.create_job.return_value = "test-job-123"
@@ -52,7 +52,7 @@ class TestIngestionEndpoint:
         """Test ingestion with custom options."""
         with (
             patch("src.api.v1.routers.ingest.job_service") as mock_job_service,
-            patch("src.api.v1.routers.ingest.ingestion_worker"),
+            patch("src.api.v1.routers.ingest.get_ingestion_worker"),
         ):
 
             mock_job_service.create_job.return_value = "test-job-456"
