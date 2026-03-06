@@ -11,6 +11,7 @@ RUN python -m venv /venv \
     && /venv/bin/pip install -U pip \
     && /venv/bin/pip install --no-cache-dir -r requirements.txt
 
+ARG CACHE_BUST
 COPY ./src ./src
 COPY ./alembic ./alembic
 COPY ./alembic.ini ./alembic.ini

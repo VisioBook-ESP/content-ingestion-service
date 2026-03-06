@@ -104,6 +104,5 @@ env:
   MINIO_SECURE: "false"
 
 secrets:
-  DATABASE_URL: "postgresql+asyncpg://user:password@postgres:5432/content_ingestion"
   MINIO_ACCESS_KEY: "minioadmin"
   MINIO_SECRET_KEY: "minioadmin"
