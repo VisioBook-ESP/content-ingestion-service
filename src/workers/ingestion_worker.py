@@ -49,4 +49,11 @@ class IngestionWorker:
             logger.error(f"Job {job_id} failed: {e}")
 
 
-ingestion_worker = IngestionWorker()
+_ingestion_worker: IngestionWorker | None = None
+
+
+def get_ingestion_worker() -> IngestionWorker:
+    global _ingestion_worker
+    if _ingestion_worker is None:
+        _ingestion_worker = IngestionWorker()
+    return _ingestion_worker

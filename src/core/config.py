@@ -1,7 +1,9 @@
 """Application configuration."""
 
+import json
 from typing import List
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -41,8 +43,18 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_MINUTES: int = 30
 
-    # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000"]
+    # CORS — str to avoid pydantic-settings JSON-parsing List fields
+    CORS_ORIGINS_RAW: str = Field(
+        default="http://localhost:3000,http://localhost:8000",
+        validation_alias="CORS_ORIGINS",
+    )
+
+    @property
+    def cors_origins(self) -> List[str]:
+        v = self.CORS_ORIGINS_RAW.strip()
+        if v.startswith("["):
+            return json.loads(v)
+        return [o.strip() for o in v.split(",") if o.strip()]
 
     # Content Storage
     STORAGE_TYPE: str = "local"
@@ -51,6 +63,13 @@ class Settings(BaseSettings):
     AWS_SECRET_ACCESS_KEY: str = ""
     AWS_BUCKET_NAME: str = ""
     AWS_REGION: str = ""
+
+    # MinIO
+    MINIO_ENDPOINT: str = "localhost:9000"
+    MINIO_ACCESS_KEY: str = "minioadmin"
+    MINIO_SECRET_KEY: str = "minioadmin"
+    MINIO_BUCKET_NAME: str = "content-ingestion"
+    MINIO_SECURE: bool = False
 
     # External Services
     STORAGE_SERVICE_URL: str = "http://localhost:8084"

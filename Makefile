@@ -1,4 +1,4 @@
-.PHONY: help install install-dev clean test lint format run docker-build docker-up docker-down
+.PHONY: help install install-dev clean test lint format run docker-build docker-up docker-down migration migrate migrate-down
 
 help:
 	@echo "Available commands:"
@@ -12,6 +12,11 @@ help:
 	@echo "  make docker-build   - Build Docker images"
 	@echo "  make docker-up      - Start Docker containers"
 	@echo "  make docker-down    - Stop Docker containers"
+	@echo ""
+	@echo "Database migrations:"
+	@echo "  make migration m=description  - Auto-generate a new migration"
+	@echo "  make migrate                  - Apply all pending migrations"
+	@echo "  make migrate-down             - Rollback the last migration"
 
 install:
 	pip install -r requirements.txt
@@ -51,3 +56,13 @@ docker-down:
 
 docker-logs:
 	docker-compose logs -f app
+
+# ---- Database migrations (run inside the app container) ----
+migration:
+	docker compose exec content-ingestion-service alembic revision --autogenerate -m "$(m)"
+
+migrate:
+	docker compose exec content-ingestion-service alembic upgrade head
+
+migrate-down:
+	docker compose exec content-ingestion-service alembic downgrade -1

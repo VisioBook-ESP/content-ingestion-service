@@ -1,0 +1,46 @@
+{
+  "fileId": "test",
+  "fileName": "test.pdf",
+  "fileType": ".pdf",
+  "fileSize": 1648,
+  "processedAt": "2026-02-12T15:45:07.010981+00:00",
+  "status": "completed",
+  "options": {
+    "cleanText": true,
+    "extractMetadata": true,
+    "chunkSize": 100,
+    "overlap": 10
+  },
+  "metadata": {
+    "title": "Document de test",
+    "author": "Test Auteur",
+    "pages": 1,
+    "created": null,
+    "modified": null,
+    "subject": "Test PDF",
+    "wordCount": 33,
+    "charCount": 222,
+    "language": "fr",
+    "customFields": {
+      "paragraphCount": 1,
+      "sentenceCount": 4
+    }
+  },
+  "processing": {
+    "cleaningApplied": [
+      "fixEncoding",
+      "normalizeQuotes",
+      "removeExtraSpaces"
+    ],
+    "totalChunks": 1,
+    "totalCharacters": 222,
+    "rawCharacters": 222
+  },
+  "chunks": [
+    {
+      "index": 0,
+      "content": "Ceci est un document PDF de test. Il contient du texte en francais pour tester le processeur PDF. Le microservice doit extraire ce texte correctement. Intelligence artificielle et traitement automatique du langage naturel.",
+      "wordCount": 33
+    }
+  ]
+}

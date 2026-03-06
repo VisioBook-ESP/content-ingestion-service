@@ -17,6 +17,7 @@ passlib[bcrypt]==1.*
 # Database
 sqlalchemy
 asyncpg==0.29.*
+alembic
 
 # Document processing
 python-docx           # DOCX extraction
@@ -58,3 +59,6 @@ watchfiles  # hot-reload uvicorn
 ipython
 
 python-multipart
+
+# Object storage
+minio>=7.1.0

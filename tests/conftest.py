@@ -9,8 +9,8 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.schemas.ingest import IngestionOptions
-from src.schemas.preprocess import CleanOptions
+from src.schemas.ingest import IngestionOptions  # noqa: E402
+from src.schemas.preprocess import CleanOptions  # noqa: E402
 
 
 @pytest.fixture
@@ -67,10 +67,15 @@ def temp_html_file(sample_html):
 
 @pytest.fixture
 def temp_pdf_file():
-    """Create a temporary PDF file (stub)."""
+    """Create a temporary valid PDF file using PyMuPDF."""
+    import fitz
+
+    doc = fitz.open()
+    doc.new_page()
     with tempfile.NamedTemporaryFile(mode="wb", suffix=".pdf", delete=False) as f:
-        f.write(b"%PDF-1.4 fake pdf content")
+        f.write(doc.tobytes())
         path = Path(f.name)
+    doc.close()
     yield path
     if path.exists():
         os.unlink(path)

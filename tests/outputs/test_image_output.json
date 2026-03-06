@@ -1,0 +1,49 @@
+{
+  "fileId": "test_image",
+  "fileName": "test_image.png",
+  "fileType": ".png",
+  "fileSize": 6319,
+  "processedAt": "2026-02-12T14:59:26.908829+00:00",
+  "status": "completed",
+  "options": {
+    "cleanText": true,
+    "extractMetadata": true,
+    "chunkSize": 100,
+    "overlap": 10
+  },
+  "metadata": {
+    "source": "ocr",
+    "ocrEngine": "tesseract",
+    "languages": "fra+eng",
+    "imageFormat": "PNG",
+    "imageSize": {
+      "width": 800,
+      "height": 200
+    },
+    "imageMode": "RGB",
+    "wordCount": 25,
+    "charCount": 167,
+    "language": "fr",
+    "customFields": {
+      "paragraphCount": 4,
+      "sentenceCount": 3
+    }
+  },
+  "processing": {
+    "cleaningApplied": [
+      "fixEncoding",
+      "normalizeQuotes",
+      "removeExtraSpaces"
+    ],
+    "totalChunks": 1,
+    "totalCharacters": 167,
+    "rawCharacters": 167
+  },
+  "chunks": [
+    {
+      "index": 0,
+      "content": "Ceciest un test OCR pour le microservice. Le texte era extat par Tesseract Intelligence artficiell et traitementdu langage. Décumentde test pour la base de donnees.",
+      "wordCount": 25
+    }
+  ]
+}

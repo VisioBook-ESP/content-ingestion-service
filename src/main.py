@@ -13,10 +13,10 @@ app = FastAPI(
 
 app.add_middleware(  # type: ignore[call-arg, arg-type]
     CORSMiddleware,  # type: ignore[arg-type]
-    allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=settings.cors_origins,  # type: ignore[arg-type]
+    allow_credentials=True,  # type: ignore[arg-type]
+    allow_methods=["*"],  # type: ignore[arg-type]
+    allow_headers=["*"],  # type: ignore[arg-type]
 )
 
 app.include_router(api_router, prefix=settings.API_PREFIX)

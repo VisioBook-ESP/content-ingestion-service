@@ -9,6 +9,8 @@ services:
     volumes:
       - ./src:/app/src
       - ./tests:/app/tests
+      - ./alembic:/app/alembic
+      - ./alembic.ini:/app/alembic.ini
       - content-storage:/tmp/content
     environment:
       # Application
@@ -41,10 +43,18 @@ services:
       - PROJECT_SERVICE_URL=http://project-service:8080
       # CORS
       - CORS_ORIGINS=http://localhost:3000,http://localhost:8080
+      # MinIO
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_BUCKET_NAME=content-ingestion
+      - MINIO_SECURE=false
     depends_on:
       db:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      minio:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/api/v1/health || exit 1"]
@@ -60,7 +70,7 @@ services:
     container_name: content-ingestion-db
     restart: unless-stopped
     ports:
-      - "5433:5432"
+      - "5435:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -72,6 +82,38 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - ingestion-network
+
+  adminer:
+    image: adminer
+    container_name: content-ingestion-adminer
+    restart: unless-stopped
+    ports:
+      - "8086:8080"
+    depends_on:
+      - db
+    networks:
+      - ingestion-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: content-ingestion-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
     networks:
       - ingestion-network
 
@@ -94,6 +136,7 @@ services:
 volumes:
   db_data:
   redis_data:
+  minio_data:
   content-storage:
 
 networks:
