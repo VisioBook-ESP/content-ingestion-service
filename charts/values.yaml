@@ -1,10 +1,4 @@
 replicaCount: 1
-name: content-ingestion-service-front
-
-image:
-  repository: ghcr.io/visiobook-esp/content-ingestion-service
-  tag: "sha-5795563"
-  pullPolicy: IfNotPresent
 
 image:
   repository: ghcr.io/visiobook-esp/content-ingestion-service-dev
