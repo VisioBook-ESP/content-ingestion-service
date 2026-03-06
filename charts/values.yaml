@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/visiobook-esp/content-ingestion-service-dev
-  tag: "latest"
+  tag: "sha-4e82541"
   pullPolicy: IfNotPresent
 
 service:
@@ -78,6 +78,9 @@ revisionHistoryLimit: 3 # nombre de revision garder sur un pod
 progressDeadlineSeconds: 60 # temps max pour que le pod soit opérationnel avant de considérer que le déploiement a échoué
 minReadySeconds: 10 # le pod doit être stable 10s avant d'être considéré Available (évite les faux positifs)
 terminationGracePeriodSeconds: 10 # délai avant SIGKILL (30s par défaut, réduit pour les tests)
+
+existingSecret: ""
+existingMinioSecret: ""
 
 env:
   # Application
