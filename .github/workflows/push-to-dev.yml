@@ -18,6 +18,8 @@ env:
 jobs:
   docker-build-and-push:
     runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
