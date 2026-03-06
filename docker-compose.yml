@@ -42,7 +42,7 @@ services:
       - DATABASE_SERVICE_URL=http://database-service:8080
       - PROJECT_SERVICE_URL=http://project-service:8080
       # CORS
-      - CORS_ORIGINS=["http://localhost:3000","http://localhost:8080"]
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:8080
       # MinIO
       - MINIO_ENDPOINT=minio:9000
       - MINIO_ACCESS_KEY=minioadmin

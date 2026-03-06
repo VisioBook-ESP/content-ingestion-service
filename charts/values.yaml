@@ -93,7 +93,7 @@ env:
   API_PREFIX: "/api/v1"
 
   # CORS
-  CORS_ORIGINS: '["https://visiobook.cloud"]'
+  CORS_ORIGINS: "https://visiobook.cloud"
 
   # MinIO
   MINIO_ENDPOINT: "minio:9000"
