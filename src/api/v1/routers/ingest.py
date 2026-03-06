@@ -2,7 +2,7 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException
 from pydantic import BaseModel
 
 from src.schemas.ingest import IngestionRequest, IngestionResponse
-from src.workers.ingestion_worker import get_ingestion_worker
+from src.workers.ingestion_worker import ingestion_worker
 from src.workers.job_service import job_service
 
 router = APIRouter()
@@ -18,7 +18,7 @@ class CancelResponse(BaseModel):
 async def ingest(req: IngestionRequest, background_tasks: BackgroundTasks):
     job_id = job_service.create_job()
     background_tasks.add_task(
-        get_ingestion_worker().run,
+        ingestion_worker.run,
         job_id,
         req.fileId,
         req.projectId,
