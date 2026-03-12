@@ -51,18 +51,22 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-          {{- range $key, $value := .Values.env }}
+            {{- range $key, $val := .Values.env }}
             - name: {{ $key }}
-              value: {{ $value | quote }}
-          {{- end }}
-          {{- if .Values.existingSecret }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- range $key, $val := .Values.secrets }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- if .Values.existingSecret }}
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.existingSecret }}
                   key: DATABASE_URL
-          {{- end }}
-          {{- if .Values.existingMinioSecret }}
+            {{- end }}
+            {{- if .Values.existingMinioSecret }}
             - name: MINIO_ENDPOINT
               valueFrom:
                 secretKeyRef:
@@ -83,7 +87,12 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.existingMinioSecret }}
                   key: MINIO_SECRET_KEY
-          {{- end }}
+            - name: MINIO_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.existingMinioSecret }}
+                  key: MINIO_BUCKET_DOCUMENTS
+            {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -99,17 +108,6 @@ spec:
           {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- if or .Values.env .Values.secrets }}
-          env:
-            {{- range $key, $val := .Values.env }}
-            - name: {{ $key }}
-              value: {{ $val | quote }}
-            {{- end }}
-            {{- range $key, $val := .Values.secrets }}
-            - name: {{ $key }}
-              value: {{ $val | quote }}
-            {{- end }}
           {{- end }}
           {{- with .Values.volumeMounts }}
           volumeMounts:

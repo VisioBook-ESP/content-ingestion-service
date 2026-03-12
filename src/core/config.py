@@ -65,7 +65,8 @@ class Settings(BaseSettings):
     AWS_REGION: str = ""
 
     # MinIO
-    MINIO_ENDPOINT: str = "localhost:9000"
+    MINIO_ENDPOINT: str = "localhost"
+    MINIO_PORT: int = 9000
     MINIO_ACCESS_KEY: str = "minioadmin"
     MINIO_SECRET_KEY: str = "minioadmin"
     MINIO_BUCKET_NAME: str = "content-ingestion"
