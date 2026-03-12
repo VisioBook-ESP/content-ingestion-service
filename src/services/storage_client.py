@@ -16,8 +16,11 @@ logger = logging.getLogger(__name__)
 
 class StorageClient:
     def __init__(self) -> None:
+        endpoint = settings.MINIO_ENDPOINT
+        if ":" not in endpoint:
+            endpoint = f"{endpoint}:{settings.MINIO_PORT}"
         self.client = Minio(
-            settings.MINIO_ENDPOINT,
+            endpoint,
             access_key=settings.MINIO_ACCESS_KEY,
             secret_key=settings.MINIO_SECRET_KEY,
             secure=settings.MINIO_SECURE,
