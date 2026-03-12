@@ -98,11 +98,3 @@ env:
   # CORS
   CORS_ORIGINS: "https://visiobook.cloud"
 
-  # MinIO
-  MINIO_ENDPOINT: "minio"
-  MINIO_BUCKET_NAME: "content-ingestion"
-  MINIO_SECURE: "false"
-
-secrets:
-  MINIO_ACCESS_KEY: "minioadmin"
-  MINIO_SECRET_KEY: "minioadmin"
