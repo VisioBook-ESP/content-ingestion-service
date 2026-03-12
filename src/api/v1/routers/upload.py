@@ -1,14 +1,19 @@
 """Upload endpoint — stores a file in MinIO and returns a fileId."""
 
+from functools import lru_cache
 from pathlib import Path
 
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 
 from src.services.storage_client import StorageClient
 
 router = APIRouter()
-storage_client = StorageClient()
+
+
+@lru_cache(maxsize=1)
+def get_storage_client() -> StorageClient:
+    return StorageClient()
 
 
 class UploadResponse(BaseModel):
@@ -22,6 +27,7 @@ class UploadResponse(BaseModel):
 async def upload(
     file: UploadFile = File(...),
     project_id: str = Form(...),
+    storage: StorageClient = Depends(get_storage_client),
 ) -> UploadResponse:
     """Upload a file to MinIO storage and return its fileId."""
     content = await file.read()
@@ -31,7 +37,7 @@ async def upload(
     file_name = file.filename or "unknown"
     content_type = file.content_type or "application/octet-stream"
 
-    file_id = await storage_client.upload(
+    file_id = await storage.upload(
         file_data=content,
         file_name=file_name,
         content_type=content_type,
