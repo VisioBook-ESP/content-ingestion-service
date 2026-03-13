@@ -55,9 +55,7 @@ class DatabaseClient:
         """Retrieve a document by file_id."""
         try:
             async with get_session() as session:
-                result = await session.execute(
-                    select(Document).where(Document.file_id == file_id)
-                )
+                result = await session.execute(select(Document).where(Document.file_id == file_id))
                 doc = result.scalar_one_or_none()
                 if doc is None:
                     return None
@@ -70,9 +68,7 @@ class DatabaseClient:
         """Delete a document by file_id."""
         try:
             async with get_session() as session:
-                result = await session.execute(
-                    select(Document).where(Document.file_id == file_id)
-                )
+                result = await session.execute(select(Document).where(Document.file_id == file_id))
                 doc = result.scalar_one_or_none()
                 if doc:
                     await session.delete(doc)

@@ -26,7 +26,9 @@ class IngestionService:
         self.processor_factory = processor_factory
         self.text_cleaning_service = text_cleaning_service
 
-    async def ingest(self, file_id: str, project_id: str, options, folder_id: str | None = None) -> dict:
+    async def ingest(
+        self, file_id: str, project_id: str, options, folder_id: str | None = None
+    ) -> dict:
         logger.info(f"Starting ingestion for file {file_id} in project {project_id}")
 
         file_path = await self.storage_client.download(file_id)
