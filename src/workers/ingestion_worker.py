@@ -37,11 +37,11 @@ class IngestionWorker:
         )
 
     async def run(
-        self, job_id: str, file_id: str, project_id: str, options, folder_id: str | None = None
+        self, job_id: str, file_id: str, project_id: str, options, token: str | None = None
     ):
         try:
             job_service.set_status(job_id, "processing")
-            result = await self.service.ingest(file_id, project_id, options, folder_id)
+            result = await self.service.ingest(file_id, project_id, options, token)
             job_service.set_status(job_id, "completed")
             job_service.set_result(job_id, result)
             logger.info(f"Job {job_id} completed: {result['totalChunks']} chunks")
