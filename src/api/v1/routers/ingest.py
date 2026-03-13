@@ -17,7 +17,9 @@ class CancelResponse(BaseModel):
 @router.post("/", response_model=IngestionResponse)
 async def ingest(req: IngestionRequest, background_tasks: BackgroundTasks, request: Request):
     auth_header = request.headers.get("Authorization", "")
-    token = auth_header.removeprefix("Bearer ").strip() if auth_header.startswith("Bearer ") else None
+    token = (
+        auth_header.removeprefix("Bearer ").strip() if auth_header.startswith("Bearer ") else None
+    )
 
     job_id = job_service.create_job()
     background_tasks.add_task(

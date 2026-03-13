@@ -38,7 +38,9 @@ class IngestionService:
             else:
                 logger.warning("Could not resolve folderId from token")
 
-        logger.info(f"Starting ingestion for file {file_id} in project {project_id} folder {folder_id}")
+        logger.info(
+            f"Starting ingestion for file {file_id} in project {project_id} folder {folder_id}"
+        )
 
         file_path = await self.storage_client.download(file_id)
         logger.info(f"Downloaded file to {file_path}")
