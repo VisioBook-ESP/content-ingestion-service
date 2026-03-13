@@ -259,5 +259,71 @@ else
   SKIP=$((SKIP + 2))
 fi
 
+# ── Folders ───────────────────────────────────────────────────────────────────
+log_section "Folders"
+
+do_curl "POST /folders/" \
+  "${AUTH_HEADER[@]}" \
+  -X POST "$BASE/api/v1/folders/"
+check "POST /api/v1/folders/"
+
+FOLDER_ID=$(echo "$BODY" | jq -r '.folderId // empty' 2>/dev/null)
+if [ -n "$FOLDER_ID" ]; then
+  log_ok "folderId generated: $FOLDER_ID" "-" "-"
+  PASS=$((PASS + 1))
+else
+  log_fail "No folderId returned" "-" "-"
+  FAIL=$((FAIL + 1))
+fi
+echo ""
+
+# ── Ingest with folderId ──────────────────────────────────────────────────────
+log_section "Ingest with folderId"
+
+do_curl "POST /upload/ (for folder test)" \
+  "${AUTH_HEADER[@]}" \
+  -X POST "$BASE/api/v1/upload/" \
+  -F "file=@$TMPFILE;filename=test-folder.txt" \
+  -F "project_id=test-project-folder"
+check "POST /api/v1/upload/ (folder)"
+
+FOLDER_FILE_ID=$(echo "$BODY" | jq -r '.fileId // empty' 2>/dev/null)
+
+if [ -n "$FOLDER_FILE_ID" ]; then
+  do_curl "POST /ingest/ (with folderId)" \
+    "${AUTH_HEADER[@]}" \
+    -X POST "$BASE/api/v1/ingest/" \
+    -H "Content-Type: application/json" \
+    -d "{
+      \"fileId\": \"$FOLDER_FILE_ID\",
+      \"projectId\": \"test-project-folder\",
+      \"folderId\": \"${FOLDER_ID:-test-folder-abc123}\",
+      \"options\": {\"cleanText\": true, \"extractMetadata\": true, \"chunkSize\": 1000, \"overlap\": 0}
+    }"
+  check "POST /api/v1/ingest/ (with folderId)"
+
+  FOLDER_JOB_ID=$(echo "$BODY" | jq -r '.jobId // empty' 2>/dev/null)
+  if [ -n "$FOLDER_JOB_ID" ]; then
+    sleep 2
+    do_curl "GET /ingest/status/$FOLDER_JOB_ID (folderId check)" \
+      "${AUTH_HEADER[@]}" \
+      "$BASE/api/v1/ingest/status/$FOLDER_JOB_ID"
+    check "GET /api/v1/ingest/status/$FOLDER_JOB_ID (folderId)"
+
+    RETURNED_FOLDER_ID=$(echo "$BODY" | jq -r '.result.folderId // empty' 2>/dev/null)
+    if [ "$RETURNED_FOLDER_ID" = "${FOLDER_ID:-test-folder-abc123}" ]; then
+      log_ok "folderId correctly stored in result" "-" "-"
+      PASS=$((PASS + 1))
+    else
+      log_fail "folderId mismatch — got: '$RETURNED_FOLDER_ID'" "-" "-"
+      FAIL=$((FAIL + 1))
+    fi
+    echo ""
+  fi
+else
+  log_skip "No fileId returned — skipping folderId test"
+  SKIP=$((SKIP + 2))
+fi
+
 # ── Summary ───────────────────────────────────────────────────────────────────
 print_summary

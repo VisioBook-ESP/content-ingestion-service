@@ -31,10 +31,10 @@ class DocxProcessor(BaseProcessor):
         core_props = doc.core_properties
 
         return {
-            "title": core_props.title,
-            "author": core_props.author,
+            "title": core_props.title or None,
+            "author": core_props.author or None,
             "pages": None,
-            "created": core_props.created,
-            "modified": core_props.modified,
-            "subject": core_props.subject,
+            "created": core_props.created.isoformat() if core_props.created else None,
+            "modified": core_props.modified.isoformat() if core_props.modified else None,
+            "subject": core_props.subject or None,
         }

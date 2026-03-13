@@ -23,6 +23,7 @@ async def ingest(req: IngestionRequest, background_tasks: BackgroundTasks):
         req.fileId,
         req.projectId,
         req.options,
+        req.folderId,
     )
     return IngestionResponse(jobId=job_id, status="queued")
 
