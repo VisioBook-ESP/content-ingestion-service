@@ -13,7 +13,6 @@ class IngestionOptions(BaseModel):
 class IngestionRequest(BaseModel):
     fileId: str
     projectId: str
-    folderId: Optional[str] = None
     options: Optional[IngestionOptions] = IngestionOptions()
 
 

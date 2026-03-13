@@ -77,6 +77,7 @@ class Settings(BaseSettings):
     AI_SERVICE_URL: str = "http://localhost:8083"
     DATABASE_SERVICE_URL: str = "http://localhost:8081"
     PROJECT_SERVICE_URL: str = "http://localhost:8080"
+    CORE_USER_SERVICE_URL: str = "http://core-user-service.visiobook-namespace.svc.cluster.local"
 
 
 settings = Settings()

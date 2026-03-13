@@ -4,6 +4,7 @@ import logging
 import os
 from datetime import datetime, timezone
 
+from src.clients.user_core_client import UserCoreClient
 from src.schemas.preprocess import CleanOptions
 
 logger = logging.getLogger(__name__)
@@ -27,8 +28,16 @@ class IngestionService:
         self.text_cleaning_service = text_cleaning_service
 
     async def ingest(
-        self, file_id: str, project_id: str, options, folder_id: str | None = None
+        self, file_id: str, project_id: str, options, token: str | None = None
     ) -> dict:
+        folder_id: str | None = None
+        if token:
+            folder_id = await UserCoreClient().get_folder_id(token)
+            if folder_id:
+                logger.info(f"Resolved folderId={folder_id} from token")
+            else:
+                logger.warning("Could not resolve folderId from token")
+
         logger.info(f"Starting ingestion for file {file_id} in project {project_id}")
 
         file_path = await self.storage_client.download(file_id)
