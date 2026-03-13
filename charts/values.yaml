@@ -99,5 +99,5 @@ env:
   CORS_ORIGINS: "https://visiobook.cloud"
 
   # Inter-service
-  CORE_USER_SERVICE_URL: "http://core-user-service.visiobook-namespace.svc.cluster.local"
+  CORE_USER_SERVICE_URL: "http://core-user-service.visiobook-namespace.svc.cluster.local:80"
 
