@@ -1,76 +1,91 @@
-"""Client for core-database-service communication."""
+"""Client for persisting ingestion results to the local PostgreSQL database."""
 
 import logging
-from typing import Optional
+from datetime import datetime, timezone
 
-import httpx
+from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert
 
-from src.core.config import settings
+from src.database.connection import get_session
+from src.models.document import Document
 
 logger = logging.getLogger(__name__)
 
 
 class DatabaseClient:
-    def __init__(self, base_url: Optional[str] = None):
-        self.base_url = base_url or getattr(
-            settings, "DATABASE_SERVICE_URL", "http://localhost:8081"
-        )
-        self.timeout = httpx.Timeout(60.0)
-
     async def save_document(
         self,
         project_id: str,
         file_id: str,
         document: dict,
     ) -> bool:
-        """Save the complete ingestion result as JSON document."""
+        """Upsert the ingestion result JSON into the documents table."""
         try:
-            async with httpx.AsyncClient(timeout=self.timeout) as client:
-                response = await client.post(
-                    f"{self.base_url}/api/v1/documents",
-                    json=document,
+            async with get_session() as session:
+                stmt = (
+                    insert(Document)
+                    .values(
+                        file_id=file_id,
+                        project_id=project_id,
+                        file_name=document.get("fileName"),
+                        file_type=document.get("fileType"),
+                        status="completed",
+                        processed_at=datetime.now(timezone.utc),
+                        data=document,
+                    )
+                    .on_conflict_do_update(
+                        index_elements=["file_id"],
+                        set_={
+                            "project_id": project_id,
+                            "status": "completed",
+                            "processed_at": datetime.now(timezone.utc),
+                            "data": document,
+                            "updated_at": datetime.now(timezone.utc),
+                        },
+                    )
                 )
-                response.raise_for_status()
-                logger.info(f"Saved document for file {file_id} in project {project_id}")
-                return True
-        except httpx.HTTPStatusError as e:
-            logger.error(f"Database service returned error: {e.response.status_code}")
-            return False
-        except httpx.RequestError as e:
-            logger.warning(f"Could not reach database service: {e}")
+                await session.execute(stmt)
+            logger.info(f"Saved document for file {file_id} in project {project_id}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to save document {file_id}: {e}")
             return False
 
-    async def get_document(self, project_id: str, file_id: str) -> Optional[dict]:
-        """Retrieve a document by project and file ID."""
+    async def get_document(self, project_id: str, file_id: str) -> dict | None:
+        """Retrieve a document by file_id."""
         try:
-            async with httpx.AsyncClient(timeout=self.timeout) as client:
-                response = await client.get(
-                    f"{self.base_url}/api/v1/documents/{project_id}/{file_id}",
+            async with get_session() as session:
+                result = await session.execute(
+                    select(Document).where(Document.file_id == file_id)
                 )
-                response.raise_for_status()
-                return response.json()
+                doc = result.scalar_one_or_none()
+                if doc is None:
+                    return None
+                return doc.data
         except Exception as e:
-            logger.error(f"Failed to get document: {e}")
+            logger.error(f"Failed to get document {file_id}: {e}")
             return None
 
     async def delete_document(self, project_id: str, file_id: str) -> bool:
-        """Delete a document."""
+        """Delete a document by file_id."""
         try:
-            async with httpx.AsyncClient(timeout=self.timeout) as client:
-                response = await client.delete(
-                    f"{self.base_url}/api/v1/documents/{project_id}/{file_id}",
+            async with get_session() as session:
+                result = await session.execute(
+                    select(Document).where(Document.file_id == file_id)
                 )
-                response.raise_for_status()
-                logger.info(f"Deleted document for file {file_id}")
-                return True
+                doc = result.scalar_one_or_none()
+                if doc:
+                    await session.delete(doc)
+            logger.info(f"Deleted document for file {file_id}")
+            return True
         except Exception as e:
-            logger.error(f"Failed to delete document: {e}")
+            logger.error(f"Failed to delete document {file_id}: {e}")
             return False
 
     async def health_check(self) -> bool:
         try:
-            async with httpx.AsyncClient(timeout=self.timeout) as client:
-                response = await client.get(f"{self.base_url}/health")
-                return response.status_code == 200
+            async with get_session() as session:
+                await session.execute(select(1))
+            return True
         except Exception:
             return False

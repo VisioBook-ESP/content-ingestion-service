@@ -26,7 +26,7 @@ class IngestionService:
         self.processor_factory = processor_factory
         self.text_cleaning_service = text_cleaning_service
 
-    async def ingest(self, file_id: str, project_id: str, options) -> dict:
+    async def ingest(self, file_id: str, project_id: str, options, folder_id: str | None = None) -> dict:
         logger.info(f"Starting ingestion for file {file_id} in project {project_id}")
 
         file_path = await self.storage_client.download(file_id)
@@ -72,6 +72,9 @@ class IngestionService:
             output_document = {
                 "fileId": file_id,
                 "projectId": project_id,
+                "folderId": folder_id,
+                "fileName": file_path.name,
+                "fileType": file_path.suffix.lower(),
                 "processedAt": datetime.now(timezone.utc).isoformat(),
                 "status": "completed",
                 "options": {
@@ -104,6 +107,7 @@ class IngestionService:
                 "status": "completed",
                 "fileId": file_id,
                 "projectId": project_id,
+                "folderId": folder_id,
                 "totalChunks": len(chunks),
                 "metadata": metadata,
             }
