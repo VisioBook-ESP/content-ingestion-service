@@ -25,7 +25,7 @@ class UserCoreClient:
                     headers={"Authorization": f"Bearer {token}"},
                 )
                 response.raise_for_status()
-                folder_id = response.json().get("folder_id")
+                folder_id = response.json().get("folderId")
                 logger.info("resolve-folder: success — folder_id=%s", folder_id)
                 return folder_id
         except httpx.HTTPStatusError as e:
