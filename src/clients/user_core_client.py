@@ -17,6 +17,7 @@ class UserCoreClient:
 
     async def get_folder_id(self, token: str) -> Optional[str]:
         """Return the folderId associated with the user identified by token."""
+        logger.info("resolve-folder: calling core-user-service")
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.get(
@@ -24,7 +25,12 @@ class UserCoreClient:
                     headers={"Authorization": f"Bearer {token}"},
                 )
                 response.raise_for_status()
-                return response.json().get("folderId")
+                folder_id = response.json().get("folderId")
+                logger.info("resolve-folder: success — folder_id=%s", folder_id)
+                return folder_id
+        except httpx.HTTPStatusError as e:
+            logger.warning("resolve-folder: HTTP %s from core-user-service", e.response.status_code)
+            return None
         except Exception as e:
-            logger.warning(f"Could not resolve folderId from core-user-service: {e}")
+            logger.warning("resolve-folder: failed to reach core-user-service — %s", e)
             return None

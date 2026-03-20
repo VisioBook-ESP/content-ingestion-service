@@ -78,6 +78,19 @@ class DatabaseClient:
             logger.error(f"Failed to delete document {file_id}: {e}")
             return False
 
+    async def get_documents_by_folder_id(self, folder_id: str) -> list[dict]:
+        """Retrieve all documents associated with a given folderId."""
+        try:
+            async with get_session() as session:
+                result = await session.execute(
+                    select(Document).where(Document.data["folderId"].astext == folder_id)
+                )
+                docs = result.scalars().all()
+                return [doc.data for doc in docs]
+        except Exception as e:
+            logger.error(f"Failed to get documents for folderId {folder_id}: {e}")
+            return []
+
     async def health_check(self) -> bool:
         try:
             async with get_session() as session:

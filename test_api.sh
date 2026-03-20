@@ -319,5 +319,25 @@ else
   SKIP=$((SKIP + 2))
 fi
 
+# ── Folders files ─────────────────────────────────────────────────────────────
+log_section "Folders files"
+
+if [ -n "$TOKEN" ]; then
+  do_curl "GET /folders/files" \
+    "${AUTH_HEADER[@]}" \
+    "$BASE/api/v1/folders/files"
+  check "GET /api/v1/folders/files"
+
+  FILES_COUNT=$(echo "$BODY" | jq -r '.count // "null"' 2>/dev/null)
+  FILES_FOLDER_ID=$(echo "$BODY" | jq -r '.folderId // "null"' 2>/dev/null)
+  log_ok "folderId=$FILES_FOLDER_ID — $FILES_COUNT file(s) returned" "-" "-"
+  echo "$BODY" | jq '.files[] | {fileId, fileName, fileType, projectId, folderId, processedAt}' 2>/dev/null | sed 's/^/    /'
+  PASS=$((PASS + 1))
+  echo ""
+else
+  log_skip "GET /api/v1/folders/files (no token)"
+  SKIP=$((SKIP + 1))
+fi
+
 # ── Summary ───────────────────────────────────────────────────────────────────
 print_summary
