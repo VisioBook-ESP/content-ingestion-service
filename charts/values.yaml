@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/visiobook-esp/content-ingestion-service-dev
-  tag: "sha-d487ed5"
+  tag: "sha-ed6a487"
   pullPolicy: IfNotPresent
 
 service:
