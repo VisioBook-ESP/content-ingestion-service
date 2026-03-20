@@ -20,7 +20,7 @@ class UserCoreClient:
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.get(
-                    f"{self.base_url}/api/v1/users/me",
+                    f"{self.base_url}/api/v1/users/resolve-folder",
                     headers={"Authorization": f"Bearer {token}"},
                 )
                 response.raise_for_status()
