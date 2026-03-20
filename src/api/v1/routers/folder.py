@@ -1,10 +1,10 @@
 import uuid
 
 from fastapi import APIRouter, HTTPException, Request, status
+from pydantic import BaseModel
 
 from src.clients.database_client import DatabaseClient
 from src.clients.user_core_client import UserCoreClient
-from pydantic import BaseModel
 
 router = APIRouter()
 
@@ -31,7 +31,9 @@ async def get_files_by_token(request: Request):
 
     folder_id = await UserCoreClient().get_folder_id(token)
     if not folder_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not resolve folderId from token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not resolve folderId from token"
+        )
 
     documents = await DatabaseClient().get_documents_by_folder_id(folder_id)
     return {"folderId": folder_id, "count": len(documents), "files": documents}
