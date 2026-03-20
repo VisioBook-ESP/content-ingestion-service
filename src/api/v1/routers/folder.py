@@ -1,6 +1,9 @@
 import uuid
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Request, status
+
+from src.clients.database_client import DatabaseClient
+from src.clients.user_core_client import UserCoreClient
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -14,3 +17,21 @@ class FolderResponse(BaseModel):
 async def create_folder():
     """Generate a folderId to associate files during ingestion."""
     return FolderResponse(folderId=str(uuid.uuid4()))
+
+
+@router.get("/files")
+async def get_files_by_token(request: Request):
+    """Return all ingested files belonging to the authenticated user."""
+    auth_header = request.headers.get("Authorization", "")
+    token = (
+        auth_header.removeprefix("Bearer ").strip() if auth_header.startswith("Bearer ") else None
+    )
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing Bearer token")
+
+    folder_id = await UserCoreClient().get_folder_id(token)
+    if not folder_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not resolve folderId from token")
+
+    documents = await DatabaseClient().get_documents_by_folder_id(folder_id)
+    return {"folderId": folder_id, "count": len(documents), "files": documents}
