@@ -25,7 +25,7 @@ class UserCoreClient:
                     headers={"Authorization": f"Bearer {token}"},
                 )
                 response.raise_for_status()
-                user_id = response.json().get("id")
+                user_id = response.json().get("uuid")
                 logger.info("get-user-id: success — user_id=%s", user_id)
                 return str(user_id) if user_id else None
         except httpx.HTTPStatusError as e:
