@@ -29,11 +29,13 @@ async def get_files_by_token(request: Request):
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing Bearer token")
 
-    folder_id = await UserCoreClient().get_folder_id(token)
-    if not folder_id:
+    user_id = await UserCoreClient().get_user_id(token)
+    if not user_id:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not resolve folderId from token"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not resolve userId from token"
         )
 
-    documents = await DatabaseClient().get_documents_by_folder_id(folder_id)
+    db = DatabaseClient()
+    folder_id = await db.get_or_create_folder(user_id)
+    documents = await db.get_documents_by_folder_id(folder_id)
     return {"folderId": folder_id, "count": len(documents), "files": documents}
