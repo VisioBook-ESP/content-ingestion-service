@@ -3,8 +3,8 @@
 import logging
 import os
 from datetime import datetime, timezone
+from typing import Optional
 
-from src.clients.user_core_client import UserCoreClient
 from src.schemas.preprocess import CleanOptions
 
 logger = logging.getLogger(__name__)
@@ -27,17 +27,48 @@ class IngestionService:
         self.processor_factory = processor_factory
         self.text_cleaning_service = text_cleaning_service
 
+    def _build_s2s_headers(
+        self,
+        user_id: Optional[str] = None,
+        authorization: Optional[str] = None,
+        request_id: Optional[str] = None,
+    ) -> dict[str, str]:
+        """Build headers to forward on outbound service-to-service calls.
+
+        Forwards:
+        - ``X-User-Id`` — identity from Istio gateway
+        - ``Authorization`` — original Bearer token (Istio ``forwardOriginalToken``)
+        - ``X-Request-Id`` — distributed tracing correlation
+        """
+        headers: dict[str, str] = {}
+        if user_id:
+            headers["X-User-Id"] = user_id
+        if authorization:
+            headers["Authorization"] = authorization
+        if request_id:
+            headers["X-Request-Id"] = request_id
+        return headers
+
     async def ingest(
-        self, file_id: str, project_id: str, options, token: str | None = None
+        self,
+        file_id: str,
+        project_id: str,
+        options,
+        user_id: Optional[str] = None,
+        authorization: Optional[str] = None,
+        request_id: Optional[str] = None,
     ) -> dict:
         folder_id: str | None = None
-        if token:
-            user_id = await UserCoreClient().get_user_id(token)
-            if user_id:
-                folder_id = await self.db_client.get_or_create_folder(user_id)
-                logger.info(f"Resolved folder_id={folder_id} for user_id={user_id}")
-            else:
-                logger.warning("Could not resolve userId from token")
+
+        # Build headers for any outbound S2S calls (storage, AI, etc.)
+        self._current_s2s_headers = self._build_s2s_headers(user_id, authorization, request_id)
+
+        # Associate file with the authenticated user's folder
+        if user_id:
+            folder_id = await self.db_client.get_or_create_folder(user_id)
+            logger.info(f"Resolved folder_id={folder_id} for user_id={user_id}")
+        else:
+            logger.warning("No user_id provided — file will not be associated with a user folder")
 
         logger.info(
             f"Starting ingestion for file {file_id} in project {project_id} folder {folder_id}"
@@ -87,6 +118,7 @@ class IngestionService:
                 "fileId": file_id,
                 "projectId": project_id,
                 "folderId": folder_id,
+                "userId": user_id,
                 "fileName": file_path.name,
                 "fileType": file_path.suffix.lower(),
                 "processedAt": datetime.now(timezone.utc).isoformat(),
@@ -122,6 +154,7 @@ class IngestionService:
                 "fileId": file_id,
                 "projectId": project_id,
                 "folderId": folder_id,
+                "userId": user_id,
                 "totalChunks": len(chunks),
                 "metadata": metadata,
             }
