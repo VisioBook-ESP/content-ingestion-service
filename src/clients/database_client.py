@@ -1,6 +1,7 @@
 """Client for persisting ingestion results to the local PostgreSQL database."""
 
 import logging
+import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import select
@@ -8,6 +9,7 @@ from sqlalchemy.dialects.postgresql import insert
 
 from src.database.connection import get_session
 from src.models.document import Document
+from src.models.folder import Folder
 
 logger = logging.getLogger(__name__)
 
@@ -90,6 +92,19 @@ class DatabaseClient:
         except Exception as e:
             logger.error(f"Failed to get documents for folderId {folder_id}: {e}")
             return []
+
+    async def get_or_create_folder(self, user_id: str) -> str:
+        """Return the existing folderId for user_id, or create and persist a new one."""
+        async with get_session() as session:
+            result = await session.execute(select(Folder).where(Folder.user_id == user_id))
+            folder = result.scalar_one_or_none()
+            if folder:
+                logger.info(f"Found existing folder_id={folder.folder_id} for user_id={user_id}")
+                return folder.folder_id
+            folder_id = str(uuid.uuid4())
+            session.add(Folder(user_id=user_id, folder_id=folder_id))
+            logger.info(f"Created new folder_id={folder_id} for user_id={user_id}")
+            return folder_id
 
     async def health_check(self) -> bool:
         try:

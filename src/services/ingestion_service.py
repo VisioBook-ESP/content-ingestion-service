@@ -32,11 +32,12 @@ class IngestionService:
     ) -> dict:
         folder_id: str | None = None
         if token:
-            folder_id = await UserCoreClient().get_folder_id(token)
-            if folder_id:
-                logger.info(f"Resolved folderId={folder_id} from token")
+            user_id = await UserCoreClient().get_user_id(token)
+            if user_id:
+                folder_id = await self.db_client.get_or_create_folder(user_id)
+                logger.info(f"Resolved folder_id={folder_id} for user_id={user_id}")
             else:
-                logger.warning("Could not resolve folderId from token")
+                logger.warning("Could not resolve userId from token")
 
         logger.info(
             f"Starting ingestion for file {file_id} in project {project_id} folder {folder_id}"
