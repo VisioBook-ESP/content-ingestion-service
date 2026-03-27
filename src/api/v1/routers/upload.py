@@ -6,6 +6,7 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 
+from src.core.dependencies import get_current_user
 from src.services.storage_client import StorageClient
 
 router = APIRouter()
@@ -27,9 +28,13 @@ class UploadResponse(BaseModel):
 async def upload(
     file: UploadFile = File(...),
     project_id: str = Form(...),
+    user_id: str = Depends(get_current_user),
     storage: StorageClient = Depends(get_storage_client),
 ) -> UploadResponse:
-    """Upload a file to MinIO storage and return its fileId."""
+    """Upload a file to MinIO storage and return its fileId.
+
+    Requires ``x-user-id`` header (set by Istio gateway).
+    """
     content = await file.read()
     if not content:
         raise HTTPException(status_code=400, detail="File is empty")

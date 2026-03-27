@@ -8,6 +8,8 @@ from fastapi.testclient import TestClient
 
 from src.api.v1.routers.ingest import router as ingest_router
 
+TEST_USER_ID = "550e8400-e29b-41d4-a716-446655440000"
+
 
 @pytest.fixture
 def app():
@@ -41,6 +43,7 @@ class TestIngestionEndpoint:
                     "fileId": "file-abc",
                     "projectId": "project-xyz",
                 },
+                headers={"x-user-id": TEST_USER_ID},
             )
 
             assert response.status_code == 200
@@ -69,6 +72,7 @@ class TestIngestionEndpoint:
                         "overlap": 50,
                     },
                 },
+                headers={"x-user-id": TEST_USER_ID},
             )
 
             assert response.status_code == 200
@@ -77,9 +81,44 @@ class TestIngestionEndpoint:
 
     def test_ingest_validates_required_fields(self, client):
         """Test that required fields are validated."""
-        response = client.post("/ingest/", json={})
+        response = client.post(
+            "/ingest/",
+            json={},
+            headers={"x-user-id": TEST_USER_ID},
+        )
 
         assert response.status_code == 422
+
+    def test_ingest_rejects_missing_user_id(self, client):
+        """Test that POST /ingest returns 422 when x-user-id header is missing."""
+        with (
+            patch("src.api.v1.routers.ingest.job_service"),
+            patch("src.api.v1.routers.ingest.get_ingestion_worker"),
+        ):
+            response = client.post(
+                "/ingest/",
+                json={
+                    "fileId": "file-abc",
+                    "projectId": "project-xyz",
+                },
+            )
+            assert response.status_code == 422
+
+    def test_ingest_rejects_invalid_user_id(self, client):
+        """Test that POST /ingest returns 401 for non-UUID x-user-id."""
+        with (
+            patch("src.api.v1.routers.ingest.job_service"),
+            patch("src.api.v1.routers.ingest.get_ingestion_worker"),
+        ):
+            response = client.post(
+                "/ingest/",
+                json={
+                    "fileId": "file-abc",
+                    "projectId": "project-xyz",
+                },
+                headers={"x-user-id": "not-a-uuid"},
+            )
+            assert response.status_code == 401
 
 
 class TestStatusEndpoint:

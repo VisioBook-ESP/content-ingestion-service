@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from src.clients.database_client import DatabaseClient
 from src.processors.docx_processor import DocxProcessor
@@ -37,11 +38,25 @@ class IngestionWorker:
         )
 
     async def run(
-        self, job_id: str, file_id: str, project_id: str, options, token: str | None = None
+        self,
+        job_id: str,
+        file_id: str,
+        project_id: str,
+        options,
+        user_id: Optional[str] = None,
+        authorization: Optional[str] = None,
+        request_id: Optional[str] = None,
     ):
         try:
             job_service.set_status(job_id, "processing")
-            result = await self.service.ingest(file_id, project_id, options, token)
+            result = await self.service.ingest(
+                file_id,
+                project_id,
+                options,
+                user_id=user_id,
+                authorization=authorization,
+                request_id=request_id,
+            )
             job_service.set_status(job_id, "completed")
             job_service.set_result(job_id, result)
             logger.info(f"Job {job_id} completed: {result['totalChunks']} chunks")

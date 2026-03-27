@@ -1,6 +1,13 @@
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
+from typing import Optional
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel
 
+from src.core.dependencies import (
+    get_authorization_header,
+    get_current_user,
+    get_request_id,
+)
 from src.schemas.ingest import IngestionRequest, IngestionResponse
 from src.workers.ingestion_worker import get_ingestion_worker
 from src.workers.job_service import job_service
@@ -15,12 +22,13 @@ class CancelResponse(BaseModel):
 
 
 @router.post("/", response_model=IngestionResponse)
-async def ingest(req: IngestionRequest, background_tasks: BackgroundTasks, request: Request):
-    auth_header = request.headers.get("Authorization", "")
-    token = (
-        auth_header.removeprefix("Bearer ").strip() if auth_header.startswith("Bearer ") else None
-    )
-
+async def ingest(
+    req: IngestionRequest,
+    background_tasks: BackgroundTasks,
+    user_id: str = Depends(get_current_user),
+    authorization: Optional[str] = Depends(get_authorization_header),
+    request_id: Optional[str] = Depends(get_request_id),
+):
     job_id = job_service.create_job()
     background_tasks.add_task(
         get_ingestion_worker().run,
@@ -28,7 +36,9 @@ async def ingest(req: IngestionRequest, background_tasks: BackgroundTasks, reque
         req.fileId,
         req.projectId,
         req.options,
-        token,
+        user_id,
+        authorization,
+        request_id,
     )
     return IngestionResponse(jobId=job_id, status="queued")
 
