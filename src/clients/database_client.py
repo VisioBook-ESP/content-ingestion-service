@@ -66,6 +66,21 @@ class DatabaseClient:
             logger.error(f"Failed to get document {file_id}: {e}")
             return None
 
+    async def get_document_by_file_id(self, file_id: str) -> dict | None:
+        """Retrieve a document's data JSONB by file_id (no project_id required)."""
+        try:
+            async with get_session() as session:
+                result = await session.execute(
+                    select(Document).where(Document.file_id == file_id)
+                )
+                doc = result.scalar_one_or_none()
+                if doc is None:
+                    return None
+                return doc.data
+        except Exception as e:
+            logger.error(f"Failed to get document by file_id {file_id}: {e}")
+            return None
+
     async def delete_document(self, project_id: str, file_id: str) -> bool:
         """Delete a document by file_id."""
         try:

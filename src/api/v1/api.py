@@ -1,9 +1,10 @@
 from fastapi import APIRouter
 
-from src.api.v1.routers import extract, folder, health, ingest, preprocess, upload, validate
+from src.api.v1.routers import document, extract, folder, health, ingest, preprocess, upload, validate
 
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["health"])
+api_router.include_router(document.router, prefix="/documents", tags=["documents"])
 api_router.include_router(folder.router, prefix="/folders", tags=["folders"])
 api_router.include_router(upload.router, prefix="/upload", tags=["upload"])
 api_router.include_router(ingest.router, prefix="/ingest", tags=["ingest"])
