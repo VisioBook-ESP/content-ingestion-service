@@ -23,5 +23,18 @@
       "Task",
       "WebFetch(domain:github.com)"
     ]
+  },
+  "model": "claude-opus-4-6",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "wsl -e bash -c \"python3 /home/camille/ESP/content-ingestion-service/.claude/hooks/read_settings_local.py\""
+          }
+        ]
+      }
+    ]
   }
 }
